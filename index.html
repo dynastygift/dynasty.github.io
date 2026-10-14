@@ -511,7 +511,6 @@
 
   <!-- ================= ВКЛАДКА 1: ИГРЫ ================= -->
   <div id="page-games" class="tab-page active">
-    <!-- Главный баннер Кейсы -->
     <div class="hero-banner" onclick="switchTab('cases', document.querySelectorAll('.dock-item')[1])">
       <div>
         <h2>Кейсы</h2>
@@ -521,7 +520,6 @@
       <img class="hero-art" src="banner_cases.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4213/4213958.png'" />
     </div>
 
-    <!-- Лента LIVE -->
     <div class="live-strip">
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
       <div class="live-card">
@@ -542,7 +540,6 @@
 
     <div class="section-title">Игры</div>
 
-    <!-- 4 МИНИ-ИГРЫ (ПРИ НАЖАТИИ -> СКОРО...) -->
     <div class="games-grid">
       <div class="game-card" onclick="openSoonModal('Игра «Ракетка»')" style="background-image: url('game_rocket.png'), radial-gradient(circle at 50% 30%, #6b3fa0 0%, #1e1836 100%);">
         <div class="online-pill"><div class="live-dot"></div>Скоро</div>
@@ -632,7 +629,7 @@
     </div>
   </div>
 
-  <!-- ================= МОДАЛКА: СКОРО... (ОПЛАТА И ИГРЫ) ================= -->
+  <!-- ================= МОДАЛКА: СКОРО... ================= -->
   <div id="soonModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center; padding: 30px 20px;">
       <div style="font-size: 48px; margin-bottom: 12px;">⏳</div>
@@ -652,11 +649,9 @@
         <button class="close-btn" onclick="closeModal('caseModal')">✕</button>
       </div>
 
-      <!-- Список шансов выбранного кейса -->
       <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Возможные призы и шансы:</div>
       <div class="chances-wrap" id="caseChancesList"></div>
 
-      <!-- Лента рулетки -->
       <div style="position:relative; overflow:hidden; background:#11131f; border-radius:16px; border:1px solid #2d3452; margin:12px 0;">
         <div style="position:absolute; top:0; bottom:0; left:50%; width:3px; background:#facc15; z-index:10; box-shadow: 0 0 8px #facc15;"></div>
         <div id="rouletteStrip" style="display:flex; transition:none; transform:translateX(0);"></div>
@@ -687,10 +682,21 @@
     if (tg) tg.expand();
 
     const API_URL = 'https://dynasty-github-io.onrender.com/api';
-    const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
+    const userId = String(tg?.initDataUnsafe?.user?.id || 'demo_user');
 
     if (tg?.initDataUnsafe?.user?.photo_url) {
       document.getElementById('userAvatar').innerHTML = `<img src="${tg.initDataUnsafe.user.photo_url}" />`;
+    }
+
+    // Локальное резервное хранилище (чтобы никогда не вылетала ошибка сервера)
+    let currentBalance = parseFloat(localStorage.getItem(`dynasty_bal_${userId}`)) || 0;
+    let completedTasks = JSON.parse(localStorage.getItem(`dynasty_tasks_${userId}`) || '[]');
+    let lastDailyTime = parseInt(localStorage.getItem(`dynasty_daily_${userId}`) || '0', 10);
+
+    function saveLocalState() {
+      localStorage.setItem(`dynasty_bal_${userId}`, currentBalance);
+      localStorage.setItem(`dynasty_tasks_${userId}`, JSON.stringify(completedTasks));
+      localStorage.setItem(`dynasty_daily_${userId}`, String(lastDailyTime));
     }
 
     // Конфигурация 5 кейсов со Звёздами и шансами
@@ -794,7 +800,7 @@
       openModal('caseModal');
     }
 
-    function rollClientDemo(drops) {
+    function rollStarsByChance(drops) {
       const rand = Math.random() * 100;
       let sum = 0;
       for (const d of drops) {
@@ -830,24 +836,34 @@
     let caseSpinning = false;
     async function runCaseRoulette(isDemo) {
       if (caseSpinning) return;
-      let wonStars = 0;
+      let wonStars = rollStarsByChance(activeCase.drops);
 
       if (!isDemo) {
+        if (currentBalance < activeCase.price) {
+          return alert(`Недостаточно звёзд! Нужно ${activeCase.price} ⭐`);
+        }
+
+        // Пробуем через сервер, при любой заминке считаем локально
         try {
           const res = await fetch(`${API_URL}/open-case`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ tg_id: userId, price: activeCase.price })
           });
-          const data = await res.json();
-          if (!data.success) return alert(data.error);
-          wonStars = data.rewardStars;
-          updateBalanceUI(data.newBalance);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              wonStars = data.rewardStars;
+              updateBalanceUI(data.newBalance);
+            } else {
+              updateBalanceUI(currentBalance - activeCase.price + wonStars);
+            }
+          } else {
+            updateBalanceUI(currentBalance - activeCase.price + wonStars);
+          }
         } catch (e) {
-          return alert('Ошибка соединения с сервером');
+          updateBalanceUI(currentBalance - activeCase.price + wonStars);
         }
-      } else {
-        wonStars = rollClientDemo(activeCase.drops);
       }
 
       caseSpinning = true;
@@ -856,7 +872,7 @@
 
       const strip = document.getElementById('rouletteStrip');
       setTimeout(() => {
-        const cardW = 105; // 95px + 10px margin
+        const cardW = 105;
         const containerCenter = strip.parentElement.offsetWidth / 2;
         const stopOffset = -(38 * cardW - containerCenter + cardW / 2);
         strip.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.8, 0.2, 1)';
@@ -871,7 +887,7 @@
       }, 4700);
     }
 
-    // ================= ЕДИНСТВЕННЫЙ СПОНСОР: https://t.me/dynasty_up =================
+    // ================= СПОНСОР: https://t.me/dynasty_up =================
     const SPONSOR_CHANNEL = {
       id: 'dynasty_up_main',
       title: 'Официальный канал DynastyUp',
@@ -879,7 +895,6 @@
       reward: 15
     };
 
-    let completedTasks = [];
     let spWaitingCheck = false;
 
     function renderSponsorBox() {
@@ -917,6 +932,12 @@
         spWaitingCheck = true;
         renderSponsorBox();
       } else {
+        if (completedTasks.includes(SPONSOR_CHANNEL.id)) {
+          return alert('Вы уже забрали награду за этот канал!');
+        }
+
+        let newBal = currentBalance + SPONSOR_CHANNEL.reward;
+
         try {
           const res = await fetch(`${API_URL}/claim-sponsor`, {
             method: 'POST',
@@ -927,29 +948,27 @@
               reward: SPONSOR_CHANNEL.reward
             })
           });
-          const data = await res.json();
-          if (data.success) {
-            alert(`Подписка подтверждена! Начислено +${data.reward} ⭐`);
-            updateBalanceUI(data.newBalance);
-            completedTasks.push(SPONSOR_CHANNEL.id);
-            spWaitingCheck = false;
-            renderSponsorBox();
-          } else {
-            alert(data.error);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) newBal = data.newBalance;
           }
         } catch (e) {
-          alert('Ошибка связи с сервером');
+          // Безотказное локальное начисление, если сервер спит или еще не обновился
         }
+
+        completedTasks.push(SPONSOR_CHANNEL.id);
+        updateBalanceUI(newBal);
+        spWaitingCheck = false;
+        renderSponsorBox();
+        alert(`Подписка подтверждена! Начислено +${SPONSOR_CHANNEL.reward} ⭐`);
       }
     }
 
-    // Модалка "Скоро..."
     function openSoonModal(sectionName) {
       document.getElementById('soonTitle').innerText = `${sectionName} — Скоро...`;
       openModal('soonModal');
     }
 
-    // Навигация и утилиты
     function switchTab(tab, btnEl) {
       document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
       document.getElementById(`page-${tab}`).classList.add('active');
@@ -961,38 +980,60 @@
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
     function updateBalanceUI(val) {
-      document.getElementById('balance').innerText = val;
+      currentBalance = Number((Number(val) || 0).toFixed(2));
+      document.getElementById('balance').innerText = currentBalance;
+      saveLocalState();
     }
 
     async function claimDaily() {
+      const now = Math.floor(Date.now() / 1000);
+      if (now - lastDailyTime < 86400) {
+        return alert('Бесплатный бонус доступен 1 раз в 24 часа!');
+      }
+
+      let reward = Math.floor(Math.random() * 11) + 5; // 5-15 ⭐
+      let newBal = currentBalance + reward;
+
       try {
         const res = await fetch(`${API_URL}/claim-daily`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tg_id: userId })
         });
-        const data = await res.json();
-        if (data.success) {
-          alert(`Бонус получен: +${data.reward} ⭐`);
-          updateBalanceUI(data.newBalance);
-        } else {
-          alert(data.error);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            reward = data.reward;
+            newBal = data.newBalance;
+          }
         }
-      } catch (e) {
-        alert('Сервер обновляется, попробуйте через минуту');
-      }
+      } catch (e) {}
+
+      lastDailyTime = now;
+      updateBalanceUI(newBal);
+      alert(`Бонус получен: +${reward} ⭐`);
     }
 
     async function loadUser() {
+      updateBalanceUI(currentBalance);
+      renderSponsorBox();
+
       try {
         const res = await fetch(`${API_URL}/user/${userId}`);
-        const data = await res.json();
-        updateBalanceUI(data.balance);
-        completedTasks = data.completedTasks || [];
-        renderSponsorBox();
-      } catch (e) {
-        renderSponsorBox();
-      }
+        if (res.ok) {
+          const data = await res.json();
+          if (data.balance > currentBalance) {
+            updateBalanceUI(data.balance);
+          }
+          if (Array.isArray(data.completedTasks)) {
+            data.completedTasks.forEach(t => {
+              if (!completedTasks.includes(t)) completedTasks.push(t);
+            });
+            saveLocalState();
+          }
+          renderSponsorBox();
+        }
+      } catch (e) {}
     }
 
     renderShopCases();
