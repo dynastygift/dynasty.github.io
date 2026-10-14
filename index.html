@@ -6,116 +6,211 @@
   <title>Dynasty Gifts</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #090c13;
+      background: radial-gradient(circle at 50% -20%, #2a1548 0%, #0d0e17 60%, #05060a 100%);
       color: #fff;
       margin: 0;
-      padding: 14px 14px 80px 14px;
+      padding: 16px 14px 90px 14px;
       text-align: center;
       user-select: none;
-    }
-    .header-title {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      color: #d4af37;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .card {
-      background: #131822;
-      padding: 16px;
-      border-radius: 16px;
-      margin-bottom: 14px;
-      border: 1px solid #202736;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-      text-align: left;
-    }
-    .balance-val {
-      font-size: 32px;
-      font-weight: 800;
-      color: #ffd700;
-      margin-top: 4px;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    /* Список кейсов */
-    .case-card {
-      background: #141b26;
-      border: 1px solid #243044;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-    .case-card::after {
-      content: "";
+    /* Фоновые декоративные элементы */
+    .glow-sphere {
       position: absolute;
-      top: -30px;
-      right: -30px;
-      width: 90px;
-      height: 90px;
-      background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(70px);
+      z-index: 0;
       pointer-events: none;
     }
-    .case-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
+    .sphere-1 { width: 220px; height: 220px; background: rgba(212, 175, 55, 0.15); top: -40px; left: -50px; }
+    .sphere-2 { width: 250px; height: 250px; background: rgba(138, 43, 226, 0.2); top: 350px; right: -60px; }
+
+    .content-wrapper { position: relative; z-index: 1; }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff2a3 0%, #d4af37 50%, #aa771c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 2px 8px rgba(212,175,55,0.4));
+    }
+
+    /* Блок баланса со стеклянным градиентом */
+    .balance-box {
+      background: linear-gradient(135deg, rgba(30, 24, 46, 0.8) 0%, rgba(16, 17, 28, 0.9) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(212, 175, 55, 0.05);
+    }
+    .balance-val {
+      font-size: 36px;
+      font-weight: 900;
+      color: #ffd700;
+      margin: 4px 0 12px 0;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+
+    /* Кейсы */
+    .cases-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .case-card {
+      background: linear-gradient(160deg, rgba(25, 28, 44, 0.85) 0%, rgba(13, 15, 24, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      text-align: left;
+      position: relative;
+    }
+    .case-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 12px;
+    }
+    .case-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .case-price {
+      font-size: 16px;
+      font-weight: 900;
       color: #ffd700;
-      font-weight: 800;
-      font-size: 15px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 4px 10px;
+      border-radius: 10px;
     }
+
+    /* Квадратный баннер 1:1 */
+    .case-banner {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: radial-gradient(circle at center, #261b40 0%, #10121d 75%);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.6);
+    }
+    .case-banner::before {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .case-banner img.main-art {
+      width: 65%;
+      height: 65%;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.8));
+      z-index: 1;
+    }
+    .banner-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(90deg, #d4af37, #aa771c);
+      color: #0d0f17;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 4px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
+
+    /* Список шансов под кейсом */
     .chances-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
-      margin: 10px 0;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .chance-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 4px 8px;
       font-size: 11px;
+      color: #94a3b8;
     }
-    .chance-tag {
-      background: #1a2230;
-      border: 1px solid #27344a;
-      border-radius: 6px;
-      padding: 3px 6px;
-      color: #a0aec0;
+    .chance-pill.gold {
+      color: #ffd700;
+      border-color: rgba(255, 215, 0, 0.4);
+      background: rgba(255, 215, 0, 0.08);
+      font-weight: bold;
     }
-    .chance-tag.gold { color: #f6c026; border-color: rgba(246,192,38,0.3); }
 
+    /* Кнопки */
     .btn-row {
       display: flex;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 10px;
     }
     button {
-      flex: 1;
-      background: #2ea6ff;
-      color: #fff;
       border: none;
-      padding: 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 800;
+      padding: 14px;
       cursor: pointer;
+      transition: all 0.2s;
     }
     button:active { transform: scale(0.97); }
-    .btn-gold { background: linear-gradient(90deg, #d4af37, #b28912); color: #000; font-weight: 800; }
-    .btn-demo { background: #263345; color: #a4b3c7; }
+    .btn-gold {
+      flex: 2;
+      background: linear-gradient(90deg, #ffd700 0%, #d4af37 50%, #b28912 100%);
+      color: #0b0e14;
+      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);
+    }
+    .btn-demo {
+      flex: 1.2;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+    }
+    .btn-claim {
+      width: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
 
-    /* Модалка с рулеткой */
+    /* Модальное окно рулетки */
     .roulette-modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
       z-index: 2000;
       flex-direction: column;
       justify-content: center;
@@ -126,24 +221,24 @@
     .roulette-container {
       width: 100%;
       max-width: 380px;
-      background: #121722;
+      background: linear-gradient(160deg, #1b162b 0%, #0f1019 100%);
       border: 2px solid #d4af37;
-      border-radius: 20px;
-      padding: 20px 14px;
+      border-radius: 24px;
+      padding: 22px 14px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 30px rgba(212,175,55,0.25);
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
     }
     .center-pointer {
       position: absolute;
-      top: 55px;
-      bottom: 60px;
+      top: 60px;
+      bottom: 65px;
       left: 50%;
       width: 4px;
       background: #ffd700;
       transform: translateX(-50%);
       z-index: 10;
-      box-shadow: 0 0 10px #ffd700;
+      box-shadow: 0 0 12px #ffd700;
     }
     .center-pointer::before {
       content: "▼";
@@ -159,9 +254,10 @@
       overflow: hidden;
       position: relative;
       margin: 25px 0;
-      border-radius: 12px;
-      background: #090c13;
-      border: 1px solid #1f2736;
+      border-radius: 14px;
+      background: #08090f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
     }
     .tape-track {
       display: flex;
@@ -169,36 +265,38 @@
       transition: none;
     }
     .item-card {
-      min-width: 110px;
-      height: 125px;
-      background: #141b27;
+      min-width: 114px;
+      height: 130px;
+      background: rgba(255, 255, 255, 0.03);
       margin: 6px;
       border-radius: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border: 1px solid #263347;
+      border: 1px solid rgba(255, 255, 255, 0.07);
       font-size: 11px;
     }
     .item-card img {
-      width: 58px;
-      height: 58px;
+      width: 56px;
+      height: 56px;
       object-fit: contain;
       margin-bottom: 6px;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
     }
-    .item-card .name { font-weight: 700; color: #e2e8f0; }
-    .item-card .stars-badge { color: #f59e0b; font-weight: bold; font-size: 10px; }
+    .item-card .name { font-weight: 700; color: #fff; }
+    .item-card .badge-rarity { color: #ffd700; font-size: 10px; font-weight: bold; }
 
-    /* Нижние вкладки */
+    /* Таб-бар снизу */
     .tab-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 60px;
-      background: #0f131c;
-      border-top: 1px solid #1f2736;
+      height: 65px;
+      background: rgba(13, 14, 23, 0.92);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -207,7 +305,7 @@
     .tab-btn {
       background: none;
       border: none;
-      color: #6d7b8d;
+      color: #64748b;
       font-size: 12px;
       display: flex;
       flex-direction: column;
@@ -216,37 +314,87 @@
       padding: 6px 0;
       cursor: pointer;
     }
-    .tab-btn.active { color: #d4af37; font-weight: bold; }
-    .tab-btn span { font-size: 18px; }
+    .tab-btn.active { color: #ffd700; font-weight: bold; }
+    .tab-btn span { font-size: 20px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    /* Карточка заданий TikTok */
+    .task-card {
+      background: linear-gradient(160deg, rgba(25, 28, 44, 0.9) 0%, rgba(13, 15, 24, 0.98) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 20px;
+      padding: 18px;
+      text-align: left;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .task-step {
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+    .task-step strong { color: #ffd700; }
   </style>
 </head>
 <body>
 
-  <div class="header-title">Dynasty Gifts</div>
+  <!-- Декоративные световые пятна -->
+  <div class="glow-sphere sphere-1"></div>
+  <div class="glow-sphere sphere-2"></div>
 
-  <!-- ВКЛАДКА 1: КЕЙСЫ -->
-  <div id="tab-cases" class="tab-content active">
-    <div class="card" style="text-align: center;">
-      <div style="font-size: 12px; color: #8292a8;">Баланс аккаунта</div>
-      <div class="balance-val"><span id="balance">0</span> ⭐</div>
-      <button style="margin-top: 10px;" onclick="claimDaily()">🎁 Забрать бонус (2-5 ⭐ раз в день)</button>
+  <div class="content-wrapper">
+    <div class="header-title">Dynasty Gifts</div>
+
+    <!-- ВКЛАДКА 1: КЕЙСЫ -->
+    <div id="tab-cases" class="tab-content active">
+      <div class="balance-box">
+        <div style="font-size: 13px; color: #94a3b8; font-weight: 600;">Баланс пользователя</div>
+        <div class="balance-val"><span id="balance">0</span> ⭐</div>
+        <button class="btn-claim" onclick="claimDaily()">🎁 Забрать бонус (2-5 ⭐ раз в 24ч)</button>
+      </div>
+
+      <div class="cases-grid" id="cases-grid"></div>
     </div>
 
-    <!-- Список из 5 кейсов -->
-    <div id="cases-container"></div>
-  </div>
+    <!-- ВКЛАДКА 2: ЗАДАНИЯ TIKTOK -->
+    <div id="tab-nft" class="tab-content">
+      <div class="task-card">
+        <div style="background: rgba(212,175,55,0.18); color: #ffd700; padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block;">АКЦИЯ В TIKTOK</div>
+        <h3 style="margin: 10px 0; color: #fff;">Бесплатный Telegram NFT</h3>
+        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 14px;">Выполни все условия в TikTok, сделай скриншоты и отправь их модератору для выдачи NFT:</div>
 
-  <!-- ВКЛАДКА 2: ЗАДАНИЯ NFT -->
-  <div id="tab-nft" class="tab-content">
-    <div class="card">
-      <div style="background: rgba(212,175,55,0.15); color: #d4af37; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block;">АКЦИЯ В TIKTOK</div>
-      <h3 style="margin: 8px 0;">Бесплатный Telegram NFT</h3>
-      <p style="font-size: 13px; color: #8e9ba8;">Оставь комментарии под 30 видео в TikTok со словами @DynastyGiftBot, пролайкай отзывы и отправь скриншоты модератору.</p>
-      <a href="https://t.me/alisamoderator" target="_blank" style="text-decoration: none;">
-        <button class="btn-gold" style="width: 100%; margin-top: 10px;">Отправить скриншоты (@alisamoderator)</button>
-      </a>
+        <div class="task-step">
+          <strong>1. Поиск:</strong> Вбей в поиск TikTok одну из фраз:<br>
+          <em>«подарки тг»</em>, <em>«телеграм подарки»</em> или <em>«бесплатные подарки»</em>.
+        </div>
+
+        <div class="task-step">
+          <strong>2. 30 комментариев:</strong> Напиши под 30 разными видео комментарии по типу:<br>
+          • <em>@DynastyGiftBot реально работает</em><br>
+          • <em>без рофла, @DynastyGiftBot имба</em><br>
+          • <em>@DynastyGiftBot я тут получил)</em>
+        </div>
+
+        <div class="task-step">
+          <strong>3. Лайки:</strong> Найди и пролайкай 30 других комментариев с упоминанием <em>@DynastyGiftBot</em>.
+        </div>
+
+        <div class="task-step">
+          <strong>4. 10 ответов:</strong> Ответь на 10 комментариев фразами:<br>
+          • <em>спасибо!!</em><br>
+          • <em>реально работает</em><br>
+          • <em>боже спасибо</em>
+        </div>
+
+        <div class="task-step">
+          <strong>5. Скриншоты:</strong> Заскринь все свои 30 комментариев, пролайканные отзывы и ответы.
+        </div>
+
+        <a href="https://t.me/alisamoderator" target="_blank" style="text-decoration: none;">
+          <button class="btn-gold" style="width: 100%; margin-top: 10px;">Отправить скриншоты (@alisamoderator)</button>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -258,7 +406,7 @@
       <div class="tape-wrapper">
         <div id="tapeTrack" class="tape-track"></div>
       </div>
-      <div id="spinResult" style="min-height: 22px; font-weight: bold; margin-bottom: 12px; font-size: 15px; color: #fff;"></div>
+      <div id="spinResult" style="min-height: 24px; font-weight: bold; margin-bottom: 14px; font-size: 15px; color: #fff;"></div>
       <button id="closeSpinBtn" class="btn-gold" style="display: none; width: 100%;" onclick="closeRoulette()">Забрать приз</button>
     </div>
   </div>
@@ -282,82 +430,92 @@
     const API_URL = 'https://dynasty-github-io.onrender.com/api';
     const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
 
-    // База предметов из твоих скриншотов на чистом темно-прозрачном фоне
     const ITEMS = {
-      pepe: { name: 'Plush Pepe', img: 'https://cdn-icons-png.flaticon.com/512/10398/10398553.png', stars: '20 000 ⭐' },
-      cupid: { name: 'Cupid Charm', img: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', stars: '150 ⭐' },
-      calendar: { name: 'Desk Calendar', img: 'https://cdn-icons-png.flaticon.com/512/5968/5968434.png', stars: '90 ⭐' },
-      ring: { name: 'Diamond Ring', img: 'https://cdn-icons-png.flaticon.com/512/263/263100.png', stars: '100 ⭐' },
-      gift: { name: 'Подарочек', img: 'https://cdn-icons-png.flaticon.com/512/4213/4213958.png', stars: '25 ⭐' }
+      gift: { name: 'Подарочек', img: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/animated/1f381.gif', badge: 'Обычный' },
+      ring: { name: 'Diamond Ring', img: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/animated/1f48d.gif', badge: 'Редкий' },
+      calendar: { name: 'Desk Calendar', img: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/animated/1f5d3.gif', badge: 'Эпический' },
+      cupid: { name: 'Cupid Charm', img: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/animated/1f496.gif', badge: 'Легендарный' },
+      pepe: { name: 'Plush Pepe', img: 'https://images.emojiterra.com/google/noto-emoji/unicode-15/animated/1f438.gif', badge: 'Мифический' }
     };
 
-    // 5 кейсов с визуальными шансами
     const CASES = [
       {
         price: 100,
         title: 'Стартовый Кейс',
+        mainArt: ITEMS.gift.img,
         chances: [
-          { text: 'Подарочек 30%' }, { text: 'Кольцо 30%' }, { text: 'Календарь 20%' }, { text: 'Купидон 15%' }, { text: 'Пепе 5%', gold: true }
+          { name: 'Подарочек 30%' }, { name: 'Кольцо 30%' }, { name: 'Календарь 20%' }, { name: 'Купидон 15%' }, { name: 'Пепе 5%', gold: true }
         ]
       },
       {
         price: 300,
         title: 'Бронзовый Кейс',
+        mainArt: ITEMS.ring.img,
         chances: [
-          { text: 'Подарочек 20%' }, { text: 'Кольцо 25%' }, { text: 'Календарь 25%' }, { text: 'Купидон 20%' }, { text: 'Пепе 10%', gold: true }
+          { name: 'Подарочек 20%' }, { name: 'Кольцо 25%' }, { name: 'Календарь 25%' }, { name: 'Купидон 20%' }, { name: 'Пепе 10%', gold: true }
         ]
       },
       {
         price: 500,
         title: 'Серебряный Кейс',
+        mainArt: ITEMS.calendar.img,
         chances: [
-          { text: 'Подарочек 10%' }, { text: 'Кольцо 20%' }, { text: 'Календарь 30%' }, { text: 'Купидон 25%' }, { text: 'Пепе 15%', gold: true }
+          { name: 'Подарочек 10%' }, { name: 'Кольцо 20%' }, { name: 'Календарь 30%' }, { name: 'Купидон 25%' }, { name: 'Пепе 15%', gold: true }
         ]
       },
       {
         price: 750,
         title: 'Золотой Кейс',
+        mainArt: ITEMS.cupid.img,
         chances: [
-          { text: 'Подарочек 5%' }, { text: 'Кольцо 15%' }, { text: 'Календарь 30%' }, { text: 'Купидон 30%' }, { text: 'Пепе 20%', gold: true }
+          { name: 'Подарочек 5%' }, { name: 'Кольцо 15%' }, { name: 'Календарь 30%' }, { name: 'Купидон 30%' }, { name: 'Пепе 20%', gold: true }
         ]
       },
       {
         price: 1000,
         title: 'Dynasty VIP Box',
+        mainArt: ITEMS.pepe.img,
         chances: [
-          { text: 'Подарочек 2%' }, { text: 'Кольцо 8%' }, { text: 'Календарь 25%' }, { text: 'Купидон 35%' }, { text: 'Пепе 30%', gold: true }
+          { name: 'Подарочек 2%' }, { name: 'Кольцо 8%' }, { name: 'Календарь 25%' }, { name: 'Купидон 35%' }, { name: 'Пепе 30%', gold: true }
         ]
       }
     ];
 
-    // Рендер кейсов
     function renderCases() {
-      const container = document.getElementById('cases-container');
-      container.innerHTML = CASES.map(c => `
+      const grid = document.getElementById('cases-grid');
+      grid.innerHTML = CASES.map(c => `
         <div class="case-card">
-          <div class="case-title">
-            <span>${c.title}</span>
-            <span class="case-price">${c.price} ⭐</span>
+          <div class="case-header">
+            <div class="case-title">✨ ${c.title}</div>
+            <div class="case-price">${c.price} ⭐</div>
           </div>
+
+          <div class="case-banner">
+            <div class="banner-badge">CASE 1:1</div>
+            <img class="main-art" src="${c.mainArt}" />
+          </div>
+
           <div class="chances-list">
-            ${c.chances.map(ch => `<div class="chance-tag ${ch.gold ? 'gold' : ''}">${ch.text}</div>`).join('')}
+            ${c.chances.map(ch => `<div class="chance-pill ${ch.gold ? 'gold' : ''}">${ch.name}</div>`).join('')}
           </div>
+
           <div class="btn-row">
-            <button class="btn-demo" onclick="spinCase(${c.price}, true)">Демо прокрут</button>
-            <button class="btn-gold" onclick="spinCase(${c.price}, false)">Открыть за ${c.price} ⭐</button>
+            <button class="btn-demo" onclick="spinCase(${c.price}, true)">Демо</button>
+            <button class="btn-gold" onclick="spinCase(${c.price}, false)">Открыть (${c.price} ⭐)</button>
           </div>
         </div>
       `).join('');
     }
 
-    // Логика рулетки
     let isSpinning = false;
     async function spinCase(price, isDemo) {
       if (isSpinning) return;
 
-      let rewardStars = Math.floor(Math.random() * 4) + 2; // 2-5 звезд
+      let realRewardStars = 0;
+      let wonItem = null;
 
       if (!isDemo) {
+        // РЕАЛЬНЫЙ РЕЖИМ: запрос на сервер (всегда падает только 2-5 звезд)
         try {
           const res = await fetch(`${API_URL}/open-case`, {
             method: 'POST',
@@ -369,12 +527,16 @@
             alert(data.error);
             return;
           }
-          rewardStars = data.rewardStars;
+          realRewardStars = data.rewardStars;
           document.getElementById('balance').innerText = data.newBalance;
         } catch (e) {
-          alert('Ошибка сервера');
+          alert('Ошибка связи с сервером');
           return;
         }
+      } else {
+        // ДЕМО-РЕЖИМ: выбираем случайный крутой NFT для демонстрации
+        const pool = [ITEMS.pepe, ITEMS.cupid, ITEMS.calendar, ITEMS.ring, ITEMS.gift];
+        wonItem = pool[Math.floor(Math.random() * pool.length)];
       }
 
       isSpinning = true;
@@ -383,47 +545,56 @@
       const resText = document.getElementById('spinResult');
       const closeBtn = document.getElementById('closeSpinBtn');
 
-      document.getElementById('modalTitle').innerText = isDemo ? 'Демо прокрутка' : `Кейс ${price} ⭐`;
+      document.getElementById('modalTitle').innerText = isDemo ? '🎮 Демо прокрутка' : `Кейс ${price} ⭐`;
       resText.innerText = 'Крутим рулетку...';
       closeBtn.style.display = 'none';
       modal.classList.add('show');
 
-      // Генерируем ленту из 60 карточек
-      const pool = [ITEMS.pepe, ITEMS.cupid, ITEMS.calendar, ITEMS.ring, ITEMS.gift];
+      // Создаем ленту из 60 карточек
+      const allItems = [ITEMS.pepe, ITEMS.cupid, ITEMS.calendar, ITEMS.ring, ITEMS.gift];
       let tapeHTML = '';
+      const stopIndex = 48; // Карточка, на которой остановится указатель
+
       for (let i = 0; i < 60; i++) {
-        const item = pool[Math.floor(Math.random() * pool.length)];
+        let currentItem;
+        if (isDemo && i === stopIndex) {
+          currentItem = wonItem; // В демо строго ставим выигранный NFT по центру
+        } else {
+          currentItem = allItems[Math.floor(Math.random() * allItems.length)];
+        }
+
         tapeHTML += `
           <div class="item-card">
-            <img src="${item.img}" />
-            <div class="name">${item.name}</div>
-            <div class="stars-badge">${item.stars}</div>
+            <img src="${currentItem.img}" />
+            <div class="name">${currentItem.name}</div>
+            <div class="badge-rarity">${currentItem.badge}</div>
           </div>
         `;
       }
       track.innerHTML = tapeHTML;
 
-      // Сброс позиции
       track.style.transition = 'none';
       track.style.transform = 'translateX(0px)';
 
-      // Запуск плавной анимации остановки
       setTimeout(() => {
-        const cardWidth = 122; // карточка + margin
-        const stopIndex = 48;  // останавливаемся на 48-й карточке
-        // Смещаем чуть левее центра указателя, создавая эффект «почти выпал Pepe!»
-        const targetOffset = -(stopIndex * cardWidth - 110);
+        const cardWidth = 126; // Ширина карточки с margin
+        const wrapperCenter = modal.querySelector('.tape-wrapper').offsetWidth / 2;
+        // Остановка точно по центру карточки с индексом stopIndex
+        const targetOffset = - (stopIndex * cardWidth - wrapperCenter + (cardWidth / 2));
 
         track.style.transition = 'transform 5.5s cubic-bezier(0.12, 0.8, 0.2, 1)';
         track.style.transform = `translateX(${targetOffset}px)`;
       }, 50);
 
-      // Окончание прокрутки
       setTimeout(() => {
         isSpinning = false;
-        resText.innerText = isDemo 
-          ? `(Демо) Вы получили: +${rewardStars} ⭐ (Утешительный приз)` 
-          : `Вы получили: +${rewardStars} ⭐ (Утешительный приз)`;
+        if (isDemo) {
+          // Чистый выигрыш без слов об утешительном призе
+          resText.innerHTML = `<span style="color: #ffd700;">🎉 (Демо) Вы выиграли: ${wonItem.name}!</span>`;
+        } else {
+          // Реальный режим
+          resText.innerHTML = `Вы получили: <span style="color: #ffd700;">+${realRewardStars} ⭐</span> (Утешительный приз)`;
+        }
         closeBtn.style.display = 'block';
       }, 5800);
     }
