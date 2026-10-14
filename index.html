@@ -18,12 +18,11 @@
       background: #090a0c;
       color: #f1f3f5;
       min-height: 100vh;
-      padding: 20px 16px 95px 16px;
+      padding: 20px 16px 100px 16px;
       overflow-x: hidden;
       user-select: none;
     }
 
-    /* Подложка с плавными монохромными градиентами */
     body::before {
       content: "";
       position: fixed;
@@ -55,7 +54,6 @@
       border-radius: 24px;
     }
 
-    /* Верхний блок: лого и профиль */
     .header {
       display: flex;
       justify-content: space-between;
@@ -83,8 +81,8 @@
 
     /* Карточка баланса */
     .balance-card {
-      padding: 22px 20px;
-      margin-bottom: 22px;
+      padding: 20px;
+      margin-bottom: 16px;
       text-align: left;
     }
     .balance-label {
@@ -97,7 +95,7 @@
       font-weight: 800;
       letter-spacing: -0.5px;
       color: #ffffff;
-      margin: 6px 0 16px 0;
+      margin: 6px 0 14px 0;
       display: flex;
       align-items: baseline;
       gap: 6px;
@@ -107,7 +105,48 @@
       color: #d1d5db;
     }
 
-    /* Горизонтальный скролл табов кейсов */
+    /* Карточка пошаговых заданий за звезды */
+    .tasks-flow-card {
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .task-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .task-counter {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #8b92a0;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+    }
+    .task-reward-pill {
+      font-size: 11px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 9px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .task-main-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    .task-sub-desc {
+      font-size: 12px;
+      color: #8b93a0;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    /* Горизонтальный скролл кейсов */
     .cases-scroll-tabs {
       display: flex;
       gap: 8px;
@@ -119,7 +158,6 @@
     .cases-scroll-tabs::-webkit-scrollbar {
       display: none;
     }
-
     .case-tab-item {
       flex: 0 0 auto;
       padding: 10px 18px;
@@ -154,7 +192,7 @@
       font-weight: 700;
     }
 
-    /* Интерактивный дисплей кейса 1:1 */
+    /* Витрина кейса 1:1 */
     .case-viewer {
       padding: 18px;
       margin-bottom: 24px;
@@ -177,10 +215,7 @@
       height: 65%;
       object-fit: contain;
       filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.7));
-      transition: transform 0.3s ease;
     }
-
-    /* Список шансов */
     .chances-container {
       display: flex;
       flex-wrap: wrap;
@@ -202,7 +237,7 @@
       color: #ffffff;
     }
 
-    /* Кнопки управления */
+    /* Кнопки */
     .btn-group {
       display: flex;
       gap: 10px;
@@ -212,7 +247,7 @@
       outline: none;
       font-size: 14px;
       font-weight: 700;
-      padding: 15px;
+      padding: 14px;
       border-radius: 16px;
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.2s;
@@ -240,7 +275,7 @@
       font-size: 13px;
     }
 
-    /* Нижний Liquid Glass Tabbar */
+    /* Нижний таббар */
     .tabbar {
       position: fixed;
       bottom: 18px;
@@ -395,19 +430,24 @@
       <div class="header-tag">Exclusive</div>
     </div>
 
-    <!-- ВКЛАДКА 1: КЕЙСЫ -->
+    <!-- ВКЛАДКА 1: КЕЙСЫ И СПОНСОРЫ -->
     <div id="tab-cases" class="tab-content active">
       <!-- Баланс -->
       <div class="balance-card liquid-glass">
         <div class="balance-label">Доступный баланс</div>
         <div class="balance-val"><span id="balance">0</span> <span class="star">⭐</span></div>
-        <button class="btn-daily" onclick="claimDaily()">Забрать ежедневный бонус</button>
+        <button class="btn-daily" onclick="claimDaily()">Забрать ежедневный бонус (2-5 ⭐)</button>
+      </div>
+
+      <!-- Блок пошаговых заданий за звезды (+0.4 ⭐) -->
+      <div class="tasks-flow-card liquid-glass" id="sponsorTaskContainer">
+        <!-- Сюда рендерится кнопка старта или текущее задание -->
       </div>
 
       <!-- Горизонтальные вкладки кейсов -->
       <div class="cases-scroll-tabs" id="casesTabs"></div>
 
-      <!-- Интерфейс активного кейса -->
+      <!-- Интерфейс выбранного кейса 1:1 -->
       <div class="case-viewer liquid-glass">
         <div class="case-media">
           <img id="activeCaseImg" src="" alt="Case Item" />
@@ -422,7 +462,7 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА 2: ЗАДАНИЯ TIKTOK -->
+    <!-- ВКЛАДКА 2: БЕСПЛАТНЫЙ NFT (TIKTOK) -->
     <div id="tab-nft" class="tab-content">
       <div class="task-card liquid-glass">
         <div class="task-title">Бесплатный Telegram NFT</div>
@@ -457,13 +497,13 @@
         </div>
 
         <a href="https://t.me/alisamoderator" target="_blank" style="text-decoration: none;">
-          <button class="btn-primary" style="width: 100%; margin-top: 10px;">Отправить скриншоты</button>
+          <button class="btn-primary" style="width: 100%; margin-top: 10px;">Отправить скриншоты (@alisamoderator)</button>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- РУЛЕТКА -->
+  <!-- МОДАЛЬНОЕ ОКНО РУЛЕТКИ -->
   <div id="rouletteModal" class="roulette-modal">
     <div class="roulette-box liquid-glass">
       <div style="font-size: 15px; font-weight: 700; color: #ffffff;" id="modalTitle">Открытие</div>
@@ -476,7 +516,7 @@
     </div>
   </div>
 
-  <!-- НИЖНИЙ НАВИГАЦИОННЫЙ ТАББАР -->
+  <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ -->
   <div class="tabbar liquid-glass">
     <button class="nav-btn active" onclick="switchNav('cases', this)">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
@@ -495,7 +535,22 @@
     const API_URL = 'https://dynasty-github-io.onrender.com/api';
     const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
 
-    // Векторные модели
+    // 5 СПОНСОРСКИХ КАНАЛОВ И БОТОВ (по 0.4 звезды каждый)
+    // Замени ссылки https://t.me/... на своих спонсоров
+    const SPONSOR_TASKS = [
+      { id: 'sp_1', title: 'Канал Спонсора #1', link: 'https://t.me/telegram', isBot: false },
+      { id: 'sp_2', title: 'Бот Партнера #2', link: 'https://t.me/BotFather', isBot: true },
+      { id: 'sp_3', title: 'Канал Спонсора #3', link: 'https://t.me/durov', isBot: false },
+      { id: 'sp_4', title: 'Бот Партнера #4', link: 'https://t.me/userinfobot', isBot: true },
+      { id: 'sp_5', title: 'VIP Канал #5', link: 'https://t.me/telegram', isBot: false }
+    ];
+
+    let completedTasks = [];
+    let tasksStarted = false;
+    let currentTaskIdx = 0;
+    let isAwaitingCheck = false;
+
+    // Встроенные векторные модели
     const ICONS = {
       gift: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%232b2f38"/><stop offset="100%" stop-color="%2312141a"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g)"/><rect x="25" y="44" width="50" height="42" rx="8" fill="%23e2e8f0"/><rect x="20" y="36" width="60" height="12" rx="4" fill="%23cbd5e1"/><rect x="45" y="36" width="10" height="50" fill="%23475569"/><path d="M50 36 C42 22 28 32 48 36 Z" fill="%2364748b"/><path d="M50 36 C58 22 72 32 52 36 Z" fill="%2364748b"/></svg>`,
       ring: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23262a33"/><stop offset="100%" stop-color="%23101217"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g2)"/><circle cx="50" cy="58" r="22" fill="none" stroke="%2394a3b8" stroke-width="8"/><circle cx="50" cy="58" r="22" fill="none" stroke="%23ffffff" stroke-width="2"/><polygon points="38,34 62,34 68,42 50,60 32,42" fill="%23e2e8f0"/><polygon points="42,34 50,60 58,34" fill="%23ffffff"/></svg>`,
@@ -561,6 +616,118 @@
     ];
 
     let currentCaseIndex = 0;
+
+    // Рендер блока заданий за звезды
+    function renderSponsorWidget() {
+      const container = document.getElementById('sponsorTaskContainer');
+      const availableTasks = SPONSOR_TASKS.filter(t => !completedTasks.includes(t.id));
+
+      // Если все 5 заданий выполнены
+      if (availableTasks.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 6px 0;">
+            <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">Все 5 заданий выполнены ✓</div>
+            <div style="font-size: 12px; color: #8b93a0;">Новые спонсорские задания появятся позже</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Если пользователь еще не нажал «Заработать звезды»
+      if (!tasksStarted) {
+        container.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div class="task-main-title">Задания за звёзды</div>
+              <div style="font-size: 12px; color: #8b93a0;">Доступно заданий: ${availableTasks.length} (по +0.4 ⭐)</div>
+            </div>
+            <button class="btn-primary" style="flex: 0 0 auto; padding: 11px 18px; font-size: 13px;" onclick="startSponsorFlow()">Начать</button>
+          </div>
+        `;
+        return;
+      }
+
+      // Находим текущее невыполненное задание
+      if (currentTaskIdx >= SPONSOR_TASKS.length) currentTaskIdx = 0;
+      let safety = 0;
+      while (completedTasks.includes(SPONSOR_TASKS[currentTaskIdx].id) && safety < SPONSOR_TASKS.length) {
+        currentTaskIdx = (currentTaskIdx + 1) % SPONSOR_TASKS.length;
+        safety++;
+      }
+
+      const task = SPONSOR_TASKS[currentTaskIdx];
+      const actionLabel = isAwaitingCheck ? 'Проверить' : (task.isBot ? 'Запустить' : 'Подписаться');
+
+      container.innerHTML = `
+        <div class="task-top-bar">
+          <div class="task-counter">Задание ${currentTaskIdx + 1} из ${SPONSOR_TASKS.length}</div>
+          <div class="task-reward-pill">+0.4 ⭐</div>
+        </div>
+        <div class="task-main-title">${task.title}</div>
+        <div class="task-sub-desc">
+          ${task.isBot ? 'Запусти бота партнера, затем вернись и нажми «Проверить».' : 'Подпишись на спонсорский канал, затем вернись и нажми «Проверить».'}
+        </div>
+        <div class="btn-group">
+          <button class="btn-secondary" style="flex: 1;" onclick="skipSponsorTask()">Пропустить</button>
+          <button class="btn-primary" style="flex: 1.6;" onclick="handleSponsorAction()">${actionLabel}</button>
+        </div>
+      `;
+    }
+
+    function startSponsorFlow() {
+      tasksStarted = true;
+      isAwaitingCheck = false;
+      renderSponsorWidget();
+    }
+
+    function skipSponsorTask() {
+      isAwaitingCheck = false;
+      currentTaskIdx = (currentTaskIdx + 1) % SPONSOR_TASKS.length;
+      renderSponsorWidget();
+    }
+
+    async function handleSponsorAction() {
+      const task = SPONSOR_TASKS[currentTaskIdx];
+
+      if (!isAwaitingCheck) {
+        // Шаг 1: Открываем канал или бота
+        if (tg?.openTelegramLink && task.link.startsWith('https://t.me/')) {
+          tg.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+        // Меняем кнопку на «Проверить»
+        isAwaitingCheck = true;
+        renderSponsorWidget();
+      } else {
+        // Шаг 2: Проверяем и начисляем +0.4 звезды
+        try {
+          const res = await fetch(`${API_URL}/claim-sponsor`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tg_id: userId,
+              task_id: task.id,
+              reward: 0.4
+            })
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            alert(`Задание проверено! Начислено: +0.4 ⭐`);
+            document.getElementById('balance').innerText = data.newBalance;
+            completedTasks.push(task.id);
+            isAwaitingCheck = false;
+            currentTaskIdx = (currentTaskIdx + 1) % SPONSOR_TASKS.length;
+            renderSponsorWidget();
+          } else {
+            alert(data.error);
+          }
+        } catch (e) {
+          alert('Ошибка соединения с сервером');
+        }
+      }
+    }
 
     function renderCaseTabs() {
       const container = document.getElementById('casesTabs');
@@ -686,7 +853,11 @@
         const res = await fetch(`${API_URL}/user/${userId}`);
         const data = await res.json();
         document.getElementById('balance').innerText = data.balance;
-      } catch (e) {}
+        completedTasks = data.completedTasks || [];
+        renderSponsorWidget();
+      } catch (e) {
+        renderSponsorWidget();
+      }
     }
 
     async function claimDaily() {
@@ -709,6 +880,7 @@
     }
 
     renderCaseTabs();
+    renderSponsorWidget();
     loadData();
   </script>
 </body>
