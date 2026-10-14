@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Dynasty Gifts</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0c0f17; color: #fff; margin: 0; padding: 20px; text-align: center; }
+    .header-title { font-size: 20px; font-weight: 800; letter-spacing: 1px; color: #d4af37; text-transform: uppercase; margin-bottom: 20px; }
+    .card { background: #161b26; padding: 20px; border-radius: 16px; margin-bottom: 16px; border: 1px solid #232c3d; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .balance-val { font-size: 36px; font-weight: bold; color: #ffd700; margin-top: 8px; }
+    button { width: 100%; background: #2ea6ff; color: #fff; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:active { transform: scale(0.97); }
+    .desc { font-size: 13px; color: #8292a8; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="header-title">Dynasty Gifts</div>
+
+  <div class="card">
+    <div style="font-size: 13px; color: #8292a8;">Твой баланс</div>
+    <div class="balance-val"><span id="balance">0</span> ⭐</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">🎁 Ежедневный кейс</h3>
+    <div class="desc">Заходи каждый день и забирай от 2 до 5 ⭐ бесплатно</div>
+    <button onclick="claimDaily()">Забрать бонус</button>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">📦 Dynasty Box</h3>
+    <div class="desc">Цена: 300 ⭐<br>Награда: Telegram NFT или 20 ⭐</div>
+    <button onclick="openCase()" style="background: linear-gradient(90deg, #d4af37, #aa820a);">Открыть кейс</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.expand();
+
+    const API_URL = 'https://dynasty-github-io.onrender.com/api';
+    const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
+
+    async function loadData() {
+      try {
+        const res = await fetch(`${API_URL}/user/${userId}`);
+        const data = await res.json();
+        document.getElementById('balance').innerText = data.balance;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function claimDaily() {
+      try {
+        const res = await fetch(`${API_URL}/claim-daily`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tg_id: userId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Успешно! Вы получили: +${data.reward} ⭐`);
+          document.getElementById('balance').innerText = data.newBalance;
+        } else {
+          alert(data.error);
+        }
+      } catch (e) {
+        alert('Сервер временно недоступен');
+      }
+    }
+
+    async function openCase() {
+      try {
+        const res = await fetch(`${API_URL}/open-case`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tg_id: userId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Дроп: ${data.prize}!`);
+          document.getElementById('balance').innerText = data.newBalance;
+        } else {
+          alert(data.error);
+        }
+      } catch (e) {
+        alert('Сервер временно недоступен');
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
