@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Dynasty</title>
+  <title>DynastyUp</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
@@ -59,7 +59,7 @@
       background: #1c2033;
       border: 1px solid #2d334d;
       border-radius: 22px;
-      padding: 5px 11px 5px 6px;
+      padding: 5px 12px 5px 6px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -71,7 +71,8 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: #3b82f6;
+      background: #eab308;
+      color: #000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -104,7 +105,7 @@
     }
     .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* БАННЕР КЕЙСЫ С ПОДАРКАМИ */
+    /* БАННЕР КЕЙСЫ СО ЗВЕЗДАМИ */
     .hero-banner {
       width: 100%;
       height: 175px;
@@ -119,6 +120,7 @@
       justify-content: space-between;
       margin-bottom: 14px;
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
     }
     .hero-banner h2 {
       font-size: 32px;
@@ -196,11 +198,14 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      min-width: 170px;
+      min-width: 165px;
     }
-    .live-card img { width: 34px; height: 34px; object-fit: contain; }
+    .live-star-icon {
+      font-size: 24px;
+      filter: drop-shadow(0 2px 6px rgba(250, 204, 21, 0.5));
+    }
     .live-info .user { font-size: 11px; color: #cbd5e1; font-weight: 600; }
-    .live-info .win { font-size: 13px; color: #4ade80; font-weight: 800; }
+    .live-info .win { font-size: 13px; color: #facc15; font-weight: 800; }
 
     /* ЗАГОЛОВКИ СЕКЦИЙ */
     .section-title {
@@ -213,7 +218,7 @@
     }
     .section-sub { font-size: 13px; color: #64748b; font-weight: 600; }
 
-    /* СЕТКА МИНИ-ИГР (2 КОЛОНКИ: РАКЕТКА, АПГРЕЙД, МИНЫ, PLINKO) */
+    /* СЕТКА МИНИ-ИГР (ПРИ НАЖАТИИ -> СКОРО...) */
     .games-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -241,7 +246,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
       pointer-events: none;
     }
     .online-pill {
@@ -304,7 +309,10 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.15s;
     }
+    .shop-case-card:active { transform: scale(0.97); }
     .shop-case-thumb {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -315,6 +323,7 @@
       justify-content: center;
       overflow: hidden;
       margin-bottom: 10px;
+      position: relative;
     }
     .shop-case-thumb img {
       width: 82%;
@@ -338,13 +347,32 @@
       color: #fff;
       border: none;
       border-radius: 14px;
-      padding: 6px 12px;
+      padding: 6px 11px;
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
     }
 
-    /* ПЛАВАЮЩИЙ ДОК-БАР СНИЗУ (ИГРЫ | КЕЙСЫ | ЗАРАБОТОК | БОНУСЫ) */
+    /* Шансы внутри модалки кейса */
+    .chances-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .chance-tag {
+      background: #121524;
+      border: 1px solid #2b324d;
+      border-radius: 10px;
+      padding: 5px 9px;
+      font-size: 11px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+    .chance-tag span { color: #facc15; font-weight: 800; }
+
+    /* ПЛАВАЮЩИЙ ДОК-БАР СНИЗУ */
     .floating-dock {
       position: fixed;
       bottom: 14px;
@@ -401,7 +429,7 @@
     .tab-page { display: none; }
     .tab-page.active { display: block; }
 
-    /* МОДАЛЬНЫЕ ОКНА (ВАЛЮТА, ПОПОЛНЕНИЕ, МИНИ-ИГРЫ, РУЛЕТКА) */
+    /* МОДАЛЬНЫЕ ОКНА */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -443,71 +471,10 @@
       cursor: pointer;
     }
 
-    /* Список валют (Скриншот 5) */
-    .curr-option {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 13px 14px;
-      border-radius: 16px;
-      margin-bottom: 8px;
-      background: #22273d;
-      cursor: pointer;
-      border: 1px solid transparent;
-    }
-    .curr-option.selected {
-      background: #282d4a;
-      border-color: #6c52ff;
-    }
-    .curr-left { display: flex; align-items: center; gap: 10px; font-weight: 700; }
-
-    /* Методы пополнения (Скриншот 6-7) */
-    .pay-cats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .pay-cat-box {
-      background: #232840;
-      border: 1px solid #323959;
-      border-radius: 16px;
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-    }
-    .pay-cat-box.active {
-      background: linear-gradient(160deg, #1b6b5c 0%, #252b47 100%);
-      border-color: #34d399;
-    }
-    .pay-method-row {
-      background: #252a45;
-      border: 1px solid #484c7a;
-      border-radius: 18px;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    /* Стили для мини-игр внутри модалки */
     .bet-controls {
       display: flex;
       gap: 8px;
       margin-top: 14px;
-    }
-    .bet-input {
-      flex: 1;
-      background: #121524;
-      border: 1px solid #2e3552;
-      color: #fff;
-      border-radius: 14px;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      text-align: center;
     }
     .action-btn {
       flex: 1.5;
@@ -515,33 +482,12 @@
       color: #fff;
       border: none;
       border-radius: 14px;
-      padding: 12px;
-      font-size: 15px;
+      padding: 13px;
+      font-size: 14px;
       font-weight: 800;
       cursor: pointer;
     }
-
-    /* Сетка Мины 5x5 */
-    .mines-board {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      margin: 14px 0;
-    }
-    .mine-tile {
-      aspect-ratio: 1 / 1;
-      background: #252b45;
-      border: 1px solid #363f63;
-      border-radius: 12px;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .mine-tile.safe { background: #1e3a5f; border-color: #38bdf8; }
-    .mine-tile.boom { background: #5c1d2e; border-color: #f43f5e; }
+    .action-btn:active { transform: scale(0.97); }
   </style>
 </head>
 <body>
@@ -549,31 +495,29 @@
   <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
   <div class="topbar">
     <div class="brand-logo">
-      <span class="white">Dynasty</span><span class="yellow">UP</span>
+      <span class="white">Dynasty</span><span class="yellow">Up</span>
       <div class="smile-arrow"></div>
     </div>
 
     <div class="topbar-right">
-      <div class="currency-pill" onclick="openModal('currencyModal')">
-        <div class="curr-icon" id="currBadge">⭐</div>
+      <div class="currency-pill" onclick="openSoonModal('Баланс Звёзд')">
+        <div class="curr-icon">⭐</div>
         <span id="balance">0</span>
-        <span style="font-size: 10px; color: #94a3b8;">▼</span>
       </div>
-      <button class="btn-topup" onclick="openModal('topupModal')">Пополнить</button>
+      <button class="btn-topup" onclick="openSoonModal('Пополнение баланса')">Пополнить</button>
       <div class="avatar-circle" id="userAvatar">D</div>
     </div>
   </div>
 
   <!-- ================= ВКЛАДКА 1: ИГРЫ ================= -->
   <div id="page-games" class="tab-page active">
-    <!-- Главный баннер Кейсы с подарками -->
-    <div class="hero-banner" onclick="switchTab('cases')">
+    <!-- Главный баннер Кейсы -->
+    <div class="hero-banner" onclick="switchTab('cases', document.querySelectorAll('.dock-item')[1])">
       <div>
         <h2>Кейсы</h2>
-        <p>с подарками</p>
+        <p>со звёздами ⭐</p>
       </div>
       <button class="hero-btn">Открыть &nbsp;❯</button>
-      <!-- Картинка баннера: можешь заменить на свою banner_cases.png -->
       <img class="hero-art" src="banner_cases.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4213/4213958.png'" />
     </div>
 
@@ -581,46 +525,42 @@
     <div class="live-strip">
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
       <div class="live-card">
-        <img src="gift.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4213/4213958.png'" />
+        <div class="live-star-icon">⭐</div>
         <div class="live-info">
           <div class="user">TRILENT333</div>
-          <div class="win">1 133 ⭐</div>
+          <div class="win">+250 ⭐</div>
         </div>
       </div>
       <div class="live-card">
-        <img src="pepe.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/263/263100.png'" />
+        <div class="live-star-icon">🌟</div>
         <div class="live-info">
           <div class="user">Вера</div>
-          <div class="win">1 200 ⭐</div>
+          <div class="win">+100 ⭐</div>
         </div>
       </div>
     </div>
 
     <div class="section-title">Игры</div>
 
-    <!-- ТОЛЬКО 4 НУЖНЫЕ МИНИ-ИГРЫ: РАКЕТКА, АПГРЕЙД, МИНЫ, PLINKO -->
+    <!-- 4 МИНИ-ИГРЫ (ПРИ НАЖАТИИ -> СКОРО...) -->
     <div class="games-grid">
-      <!-- 1. Ракетка -->
-      <div class="game-card" onclick="openGame('crash')" style="background-image: url('game_rocket.png'), radial-gradient(circle at 50% 30%, #6b3fa0 0%, #1e1836 100%);">
-        <div class="online-pill"><div class="live-dot"></div>81 играет</div>
+      <div class="game-card" onclick="openSoonModal('Игра «Ракетка»')" style="background-image: url('game_rocket.png'), radial-gradient(circle at 50% 30%, #6b3fa0 0%, #1e1836 100%);">
+        <div class="online-pill"><div class="live-dot"></div>Скоро</div>
         <div class="game-card-title">Ракетка</div>
       </div>
 
-      <!-- 2. Апгрейд -->
-      <div class="game-card" onclick="openGame('upgrade')" style="background-image: url('game_upgrade.png'), radial-gradient(circle at 50% 30%, #992915 0%, #2e110d 100%);">
-        <div class="online-pill"><div class="live-dot"></div>110 играют</div>
+      <div class="game-card" onclick="openSoonModal('Игра «Апгрейд»')" style="background-image: url('game_upgrade.png'), radial-gradient(circle at 50% 30%, #992915 0%, #2e110d 100%);">
+        <div class="online-pill"><div class="live-dot"></div>Скоро</div>
         <div class="game-card-title">Апгрейд</div>
       </div>
 
-      <!-- 3. Мины -->
-      <div class="game-card" onclick="openGame('mines')" style="background-image: url('game_mines.png'), radial-gradient(circle at 50% 30%, #1d4ed8 0%, #111a3a 100%);">
-        <div class="online-pill"><div class="live-dot"></div>20 играют</div>
+      <div class="game-card" onclick="openSoonModal('Игра «Мины»')" style="background-image: url('game_mines.png'), radial-gradient(circle at 50% 30%, #1d4ed8 0%, #111a3a 100%);">
+        <div class="online-pill"><div class="live-dot"></div>Скоро</div>
         <div class="game-card-title">Мины</div>
       </div>
 
-      <!-- 4. Plinko -->
-      <div class="game-card" onclick="openGame('plinko')" style="background-image: url('game_plinko.png'), radial-gradient(circle at 50% 30%, #4f46e5 0%, #171636 100%);">
-        <div class="online-pill"><div class="live-dot"></div>15 играют</div>
+      <div class="game-card" onclick="openSoonModal('Игра «Plinko»')" style="background-image: url('game_plinko.png'), radial-gradient(circle at 50% 30%, #4f46e5 0%, #171636 100%);">
+        <div class="online-pill"><div class="live-dot"></div>Скоро</div>
         <div class="game-card-title">Plinko</div>
       </div>
     </div>
@@ -629,53 +569,52 @@
   <!-- ================= ВКЛАДКА 2: КЕЙСЫ ================= -->
   <div id="page-cases" class="tab-page">
     <div class="filter-pills">
-      <div class="filter-pill active">Все</div>
+      <div class="filter-pill active">Все кейсы</div>
       <div class="filter-pill">Бесплатные</div>
-      <div class="filter-pill">На сдачу</div>
-      <div class="filter-pill">VIP NFT</div>
+      <div class="filter-pill">Звёздные</div>
     </div>
 
     <div class="section-title">Бесплатные</div>
     <div class="cases-2col">
-      <div class="shop-case-card">
+      <div class="shop-case-card" onclick="claimDaily()">
         <div class="shop-case-thumb">
           <img src="case_free1.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4213/4213958.png'" />
         </div>
         <div class="shop-case-bottom">
-          <span class="shop-case-name">Подарок дня</span>
-          <button class="shop-case-btn" onclick="claimDaily()">Бесплатно</button>
+          <span class="shop-case-name">Бонус дня</span>
+          <button class="shop-case-btn">Бесплатно</button>
         </div>
       </div>
 
-      <div class="shop-case-card">
+      <div class="shop-case-card" onclick="switchTab('earn', document.querySelectorAll('.dock-item')[2])">
         <div class="shop-case-thumb">
-          <img src="case_free2.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/263/263100.png'" />
+          <img src="case_free2.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1828/1828884.png'" />
         </div>
         <div class="shop-case-bottom">
-          <span class="shop-case-name">NFT-кейс</span>
-          <button class="shop-case-btn" onclick="switchTab('earn')">Бесплатно</button>
+          <span class="shop-case-name">За подписку</span>
+          <button class="shop-case-btn">+15 ⭐</button>
         </div>
       </div>
     </div>
 
     <div class="section-title">
-      <span>На сдачу и VIP</span>
+      <span>Звёздные кейсы</span>
       <span class="section-sub">5 кейсов</span>
     </div>
     <div class="cases-2col" id="paidCasesGrid"></div>
   </div>
 
-  <!-- ================= ВКЛАДКА 3: ЗАРАБОТОК (СПОНСОРЫ + TIKTOK) ================= -->
+  <!-- ================= ВКЛАДКА 3: ЗАРАБОТОК (СПОНСОР DYNASTY_UP + TIKTOK) ================= -->
   <div id="page-earn" class="tab-page">
-    <div class="section-title">Задания за звёзды (+0.4 ⭐)</div>
+    <div class="section-title">Задание спонсора</div>
     <div class="modal-card" style="max-width: 100%; margin-bottom: 18px;" id="sponsorTaskBox"></div>
 
-    <div class="section-title">Бесплатный Telegram NFT</div>
+    <div class="section-title">Акция в TikTok</div>
     <div class="modal-card" style="max-width: 100%; line-height: 1.5; font-size: 13px; color: #cbd5e1;">
-      <p style="margin-bottom: 10px; color: #fff; font-weight: 700;">Выполни условия в TikTok и забери гарантированный NFT подарок:</p>
+      <p style="margin-bottom: 10px; color: #fff; font-weight: 700;">Выполни условия в TikTok и получи бонус от проекта DynastyUp:</p>
       <p><strong>1. Поиск:</strong> Вбей в TikTok «подарки тг», «телеграм подарки» или «бесплатные подарки».</p>
-      <p style="margin-top: 6px;"><strong>2. 30 комментариев:</strong> Напиши под 30 видео:<br>• <em>@DynastyGiftBot реально работает</em><br>• <em>без рофла, @DynastyGiftBot имба</em><br>• <em>@DynastyGiftBot я тут получил)</em></p>
-      <p style="margin-top: 6px;"><strong>3. Актив:</strong> Пролайкай 30 других комментариев с упоминанием @DynastyGiftBot и ответь на 10 из них («спасибо!!», «реально работает», «боже спасибо»).</p>
+      <p style="margin-top: 6px;"><strong>2. 30 комментариев:</strong> Напиши под 30 видео:<br>• <em>@DynastyUp реально работает</em><br>• <em>без рофла, @DynastyUp имба</em><br>• <em>@DynastyUp я тут получил)</em></p>
+      <p style="margin-top: 6px;"><strong>3. Актив:</strong> Пролайкай 30 других комментариев с упоминанием @DynastyUp и ответь на 10 из них («спасибо!!», «реально работает», «боже спасибо»).</p>
       <a href="https://t.me/alisamoderator" target="_blank" style="text-decoration: none;">
         <button class="action-btn" style="width: 100%; margin-top: 14px;">Отправить скриншоты (@alisamoderator)</button>
       </a>
@@ -686,108 +625,45 @@
   <div id="page-bonuses" class="tab-page">
     <div class="section-title">Ежедневные бонусы</div>
     <div class="modal-card" style="max-width: 100%; text-align: center; padding: 28px 18px;">
-      <div style="font-size: 46px; margin-bottom: 10px;">🎁</div>
-      <h3 style="margin-bottom: 6px;">Бонус каждые 24 часа</h3>
-      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 18px;">Забирай от 2 до 5 ⭐ бесплатно каждый день на свой баланс Dynasty!</p>
-      <button class="action-btn" style="width: 100%;" onclick="claimDaily()">Забрать бонус</button>
+      <div style="font-size: 46px; margin-bottom: 10px;">⭐</div>
+      <h3 style="margin-bottom: 6px;">Бесплатные звёзды</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 18px;">Забирай от 5 до 15 ⭐ бесплатно каждые 24 часа на свой баланс DynastyUp!</p>
+      <button class="action-btn" style="width: 100%;" onclick="claimDaily()">Забрать ежедневный бонус</button>
     </div>
   </div>
 
-  <!-- ================= МОДАЛКА 1: ВЫБОР ВАЛЮТЫ (Скриншот 5) ================= -->
-  <div id="currencyModal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Валюта</h3>
-        <button class="close-btn" onclick="closeModal('currencyModal')">✕</button>
-      </div>
-      <div class="curr-option" onclick="setCurrency('₽', '#3b82f6', this)">
-        <div class="curr-left"><div class="curr-icon" style="background:#3b82f6;">₽</div>Рубли</div>
-        <strong>0</strong>
-      </div>
-      <div class="curr-option" onclick="setCurrency('₮', '#10b981', this)">
-        <div class="curr-left"><div class="curr-icon" style="background:#10b981;">₮</div>USDT</div>
-        <strong>0,00</strong>
-      </div>
-      <div class="curr-option" onclick="setCurrency('💎', '#0ea5e9', this)">
-        <div class="curr-left"><div class="curr-icon" style="background:#0ea5e9;">💎</div>TON</div>
-        <strong>0,00</strong>
-      </div>
-      <div class="curr-option selected" onclick="setCurrency('⭐', '#eab308', this)">
-        <div class="curr-left"><div class="curr-icon" style="background:#eab308;">⭐</div>Звёзды</div>
-        <strong id="modalStarBal">0</strong>
-      </div>
-      <div class="bet-controls">
-        <button class="action-btn" onclick="closeModal('currencyModal'); openModal('topupModal');">Пополнить</button>
-      </div>
+  <!-- ================= МОДАЛКА: СКОРО... (ОПЛАТА И ИГРЫ) ================= -->
+  <div id="soonModal" class="modal-overlay">
+    <div class="modal-card" style="text-align: center; padding: 30px 20px;">
+      <div style="font-size: 48px; margin-bottom: 12px;">⏳</div>
+      <h3 id="soonTitle" style="font-size: 22px; margin-bottom: 8px;">Скоро...</h3>
+      <p style="font-size: 14px; color: #94a3b8; line-height: 1.45; margin-bottom: 20px;">
+        Данный раздел находится в разработке и совсем скоро станет доступен в <strong>DynastyUp</strong>!
+      </p>
+      <button class="action-btn" style="width: 100%;" onclick="closeModal('soonModal')">Понятно</button>
     </div>
   </div>
 
-  <!-- ================= МОДАЛКА 2: ПОПОЛНИТЬ БАЛАНС (Скриншот 6-7) ================= -->
-  <div id="topupModal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Пополнить баланс</h3>
-        <button class="close-btn" onclick="closeModal('topupModal')">✕</button>
-      </div>
-      <div class="pay-cats">
-        <div class="pay-cat-box active">
-          <div style="font-size:18px;">💳</div>
-          <div style="font-size:12px; font-weight:800; margin-top:4px;">Рубли</div>
-          <div style="font-size:10px; color:#94a3b8;">от 100 ₽</div>
-        </div>
-        <div class="pay-cat-box">
-          <div style="font-size:18px;">💎</div>
-          <div style="font-size:12px; font-weight:800; margin-top:4px;">Крипта</div>
-          <div style="font-size:10px; color:#94a3b8;">+5% бонус</div>
-        </div>
-        <div class="pay-cat-box">
-          <div style="font-size:18px;">⭐</div>
-          <div style="font-size:12px; font-weight:800; margin-top:4px;">Telegram</div>
-          <div style="font-size:10px; color:#94a3b8;">Звёзды / NFT</div>
-        </div>
-      </div>
-
-      <div class="pay-method-row" onclick="alert('Для пополнения напишите администратору или используйте Telegram Stars')">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="background:#22c55e; color:#000; font-weight:900; padding:5px 10px; border-radius:10px; font-size:12px;">SberPay</span>
-          <strong>SberPay</strong>
-        </div>
-        <span style="font-size:12px; color:#94a3b8;">от 500 ₽</span>
-      </div>
-
-      <div class="pay-method-row" onclick="alert('Для пополнения напишите администратору или используйте Telegram Stars')">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="background:#3b82f6; color:#fff; font-weight:900; padding:5px 10px; border-radius:10px; font-size:12px;">СБП / Моб</span>
-          <strong>Мобильная связь</strong>
-        </div>
-        <span style="font-size:12px; color:#94a3b8;">от 100 ₽</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= МОДАЛКА 3: МИНИ-ИГРЫ ================= -->
-  <div id="gameModal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="gameModalTitle">Игра</h3>
-        <button class="close-btn" onclick="closeModal('gameModal')">✕</button>
-      </div>
-      <div id="gameStage"></div>
-    </div>
-  </div>
-
-  <!-- ================= МОДАЛКА 4: ОТКРЫТИЕ КЕЙСА И РУЛЕТКА ================= -->
+  <!-- ================= МОДАЛКА: ОТКРЫТИЕ КЕЙСА СО ЗВЁЗДАМИ ================= -->
   <div id="caseModal" class="modal-overlay">
     <div class="modal-card" style="text-align:center;">
       <div class="modal-header">
         <h3 id="caseModalTitle">Кейс</h3>
         <button class="close-btn" onclick="closeModal('caseModal')">✕</button>
       </div>
-      <div style="position:relative; overflow:hidden; background:#11131f; border-radius:16px; border:1px solid #2d3452; margin:14px 0;">
-        <div style="position:absolute; top:0; bottom:0; left:50%; width:3px; background:#facc15; z-index:10;"></div>
+
+      <!-- Список шансов выбранного кейса -->
+      <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Возможные призы и шансы:</div>
+      <div class="chances-wrap" id="caseChancesList"></div>
+
+      <!-- Лента рулетки -->
+      <div style="position:relative; overflow:hidden; background:#11131f; border-radius:16px; border:1px solid #2d3452; margin:12px 0;">
+        <div style="position:absolute; top:0; bottom:0; left:50%; width:3px; background:#facc15; z-index:10; box-shadow: 0 0 8px #facc15;"></div>
         <div id="rouletteStrip" style="display:flex; transition:none; transform:translateX(0);"></div>
       </div>
-      <div id="caseSpinStatus" style="min-height:22px; font-size:14px; font-weight:700; color:#facc15; margin-bottom:12px;"></div>
+
+      <div id="caseSpinStatus" style="min-height:22px; font-size:14px; font-weight:800; color:#facc15; margin-bottom:12px;"></div>
+
       <div class="bet-controls">
         <button class="action-btn" style="background:#262c45; flex:1;" onclick="runCaseRoulette(true)">Демо</button>
         <button class="action-btn" id="buyCaseBtn" style="flex:2;" onclick="runCaseRoulette(false)">Открыть</button>
@@ -817,29 +693,80 @@
       document.getElementById('userAvatar').innerHTML = `<img src="${tg.initDataUnsafe.user.photo_url}" />`;
     }
 
-    // Модели NFT подарков для кейсов
-    const NFT_ITEMS = [
-      { name: 'Подарочек', img: 'gift.png', fallback: 'https://cdn-icons-png.flaticon.com/512/4213/4213958.png' },
-      { name: 'Diamond Ring', img: 'ring.png', fallback: 'https://cdn-icons-png.flaticon.com/512/263/263100.png' },
-      { name: 'Desk Calendar', img: 'calendar.png', fallback: 'https://cdn-icons-png.flaticon.com/512/5968/5968434.png' },
-      { name: 'Cupid Charm', img: 'cupid.png', fallback: 'https://cdn-icons-png.flaticon.com/512/833/833472.png' },
-      { name: 'Plush Pepe', img: 'pepe.png', fallback: 'https://cdn-icons-png.flaticon.com/512/10398/10398553.png' }
+    // Конфигурация 5 кейсов со Звёздами и шансами
+    const STAR_CASES = [
+      {
+        name: 'Стартовый',
+        price: 10,
+        img: 'case_1.png',
+        fallback: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png',
+        drops: [
+          { stars: 5, chance: 45 },
+          { stars: 10, chance: 30 },
+          { stars: 15, chance: 15 },
+          { stars: 25, chance: 8 },
+          { stars: 50, chance: 2 }
+        ]
+      },
+      {
+        name: 'Бронзовый',
+        price: 25,
+        img: 'case_2.png',
+        fallback: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png',
+        drops: [
+          { stars: 10, chance: 45 },
+          { stars: 20, chance: 30 },
+          { stars: 35, chance: 15 },
+          { stars: 50, chance: 8 },
+          { stars: 100, chance: 2 }
+        ]
+      },
+      {
+        name: 'Серебряный',
+        price: 50,
+        img: 'case_3.png',
+        fallback: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png',
+        drops: [
+          { stars: 20, chance: 45 },
+          { stars: 40, chance: 30 },
+          { stars: 75, chance: 15 },
+          { stars: 100, chance: 8 },
+          { stars: 250, chance: 2 }
+        ]
+      },
+      {
+        name: 'Золотой',
+        price: 100,
+        img: 'case_4.png',
+        fallback: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png',
+        drops: [
+          { stars: 40, chance: 45 },
+          { stars: 80, chance: 30 },
+          { stars: 150, chance: 15 },
+          { stars: 250, chance: 8 },
+          { stars: 500, chance: 2 }
+        ]
+      },
+      {
+        name: 'DynastyUp VIP',
+        price: 250,
+        img: 'case_5.png',
+        fallback: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png',
+        drops: [
+          { stars: 100, chance: 45 },
+          { stars: 200, chance: 30 },
+          { stars: 350, chance: 15 },
+          { stars: 500, chance: 8 },
+          { stars: 1000, chance: 2 }
+        ]
+      }
     ];
 
-    // Кейсы (как на скринах + VIP линейка)
-    const PAID_CASES = [
-      { name: 'Мелочь', price: 39, img: 'case_1.png', fallback: NFT_ITEMS[0].fallback },
-      { name: 'Сдача', price: 49, img: 'case_2.png', fallback: NFT_ITEMS[1].fallback },
-      { name: 'Копилка', price: 100, img: 'case_3.png', fallback: NFT_ITEMS[2].fallback },
-      { name: 'Заначка', price: 300, img: 'case_4.png', fallback: NFT_ITEMS[3].fallback },
-      { name: 'Dynasty VIP', price: 750, img: 'case_5.png', fallback: NFT_ITEMS[4].fallback }
-    ];
-
-    let activeCase = PAID_CASES[0];
+    let activeCase = STAR_CASES[0];
 
     function renderShopCases() {
       const grid = document.getElementById('paidCasesGrid');
-      grid.innerHTML = PAID_CASES.map((c, idx) => `
+      grid.innerHTML = STAR_CASES.map((c, idx) => `
         <div class="shop-case-card" onclick="openCasePreview(${idx})">
           <div class="shop-case-thumb">
             <img src="${c.img}" onerror="this.src='${c.fallback}'" />
@@ -853,23 +780,45 @@
     }
 
     function openCasePreview(idx) {
-      activeCase = PAID_CASES[idx];
+      activeCase = STAR_CASES[idx];
       document.getElementById('caseModalTitle').innerText = `${activeCase.name} (${activeCase.price} ⭐)`;
       document.getElementById('buyCaseBtn').innerText = `Открыть за ${activeCase.price} ⭐`;
-      document.getElementById('caseSpinStatus').innerText = 'Нажми Открыть или Демо';
-      buildRouletteStrip();
+      document.getElementById('caseSpinStatus').innerText = 'Испытай удачу!';
+
+      const chancesEl = document.getElementById('caseChancesList');
+      chancesEl.innerHTML = activeCase.drops.map(d => `
+        <div class="chance-tag"><span>${d.stars} ⭐</span> (${d.chance}%)</div>
+      `).join('');
+
+      buildRouletteStrip(activeCase.drops[0].stars);
       openModal('caseModal');
     }
 
-    function buildRouletteStrip(forcedWinItem = null) {
+    function rollClientDemo(drops) {
+      const rand = Math.random() * 100;
+      let sum = 0;
+      for (const d of drops) {
+        sum += d.chance;
+        if (rand <= sum) return d.stars;
+      }
+      return drops[0].stars;
+    }
+
+    function buildRouletteStrip(winningStars) {
       const strip = document.getElementById('rouletteStrip');
       let html = '';
+      const drops = activeCase.drops;
+      const winIndex = 38;
+
       for (let i = 0; i < 50; i++) {
-        const it = (forcedWinItem && i === 38) ? forcedWinItem : NFT_ITEMS[Math.floor(Math.random() * NFT_ITEMS.length)];
+        const starsVal = (i === winIndex)
+          ? winningStars
+          : drops[Math.floor(Math.random() * drops.length)].stars;
+
         html += `
-          <div style="min-width:95px; height:105px; margin:5px; background:#1c2136; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px;">
-            <img src="${it.img}" onerror="this.src='${it.fallback}'" style="width:48px; height:48px; object-fit:contain;" />
-            <div style="font-size:10px; font-weight:700; margin-top:6px;">${it.name}</div>
+          <div style="min-width:95px; height:105px; margin:5px; background:#1c2136; border:1px solid #2e3654; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px;">
+            <div style="font-size:32px; filter:drop-shadow(0 2px 8px rgba(250,204,21,0.45));">⭐</div>
+            <div style="font-size:13px; font-weight:900; color:#facc15; margin-top:6px;">+${starsVal} ⭐</div>
           </div>
         `;
       }
@@ -881,303 +830,123 @@
     let caseSpinning = false;
     async function runCaseRoulette(isDemo) {
       if (caseSpinning) return;
-      let rewardStars = 0;
-      let demoTarget = NFT_ITEMS[Math.floor(Math.random() * NFT_ITEMS.length)];
+      let wonStars = 0;
 
       if (!isDemo) {
-        const res = await fetch(`${API_URL}/open-case`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tg_id: userId, price: activeCase.price })
-        });
-        const data = await res.json();
-        if (!data.success) return alert(data.error);
-        rewardStars = data.rewardStars;
-        updateBalanceUI(data.newBalance);
+        try {
+          const res = await fetch(`${API_URL}/open-case`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tg_id: userId, price: activeCase.price })
+          });
+          const data = await res.json();
+          if (!data.success) return alert(data.error);
+          wonStars = data.rewardStars;
+          updateBalanceUI(data.newBalance);
+        } catch (e) {
+          return alert('Ошибка соединения с сервером');
+        }
+      } else {
+        wonStars = rollClientDemo(activeCase.drops);
       }
 
       caseSpinning = true;
-      document.getElementById('caseSpinStatus').innerText = 'Крутим...';
-      buildRouletteStrip(isDemo ? demoTarget : null);
+      document.getElementById('caseSpinStatus').innerText = 'Крутим рулетку...';
+      buildRouletteStrip(wonStars);
 
       const strip = document.getElementById('rouletteStrip');
       setTimeout(() => {
+        const cardW = 105; // 95px + 10px margin
+        const containerCenter = strip.parentElement.offsetWidth / 2;
+        const stopOffset = -(38 * cardW - containerCenter + cardW / 2);
         strip.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.8, 0.2, 1)';
-        strip.style.transform = 'translateX(-3820px)';
+        strip.style.transform = `translateX(${stopOffset}px)`;
       }, 50);
 
       setTimeout(() => {
         caseSpinning = false;
         document.getElementById('caseSpinStatus').innerText = isDemo
-          ? `🎉 (Демо) Выпал: ${demoTarget.name}!`
-          : `Вы получили: +${rewardStars} ⭐`;
+          ? `🎉 (Демо) Выпало: +${wonStars} ⭐!`
+          : `🎉 Вы выиграли: +${wonStars} ⭐!`;
       }, 4700);
     }
 
-    // ================= 4 МИНИ-ИГРЫ =================
-    async function changeBalanceServer(delta) {
-      const res = await fetch(`${API_URL}/game-action`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tg_id: userId, delta })
-      });
-      const data = await res.json();
-      if (data.success) updateBalanceUI(data.newBalance);
-      return data;
-    }
+    // ================= ЕДИНСТВЕННЫЙ СПОНСОР: https://t.me/dynasty_up =================
+    const SPONSOR_CHANNEL = {
+      id: 'dynasty_up_main',
+      title: 'Официальный канал DynastyUp',
+      link: 'https://t.me/dynasty_up',
+      reward: 15
+    };
 
-    function openGame(type) {
-      openModal('gameModal');
-      const stage = document.getElementById('gameStage');
-
-      // 1. РАКЕТКА (CRASH)
-      if (type === 'crash') {
-        document.getElementById('gameModalTitle').innerText = '🚀 Ракетка';
-        stage.innerHTML = `
-          <div style="background:#11131f; border-radius:18px; padding:30px 10px; text-align:center; border:1px solid #2b324d;">
-            <div id="rocketEmoji" style="font-size:48px; transition:transform 0.3s;">🚀</div>
-            <div id="crashMult" style="font-size:36px; font-weight:900; color:#a855f7; margin-top:8px;">1.00x</div>
-            <div id="crashStatus" style="font-size:12px; color:#94a3b8; margin-top:4px;">Сделайте ставку</div>
-          </div>
-          <div class="bet-controls">
-            <input type="number" id="crashBet" class="bet-input" value="10" min="1" />
-            <button class="action-btn" id="crashBtn" onclick="startCrash()">Ставка</button>
-          </div>
-        `;
-      }
-
-      // 2. АПГРЕЙД
-      if (type === 'upgrade') {
-        document.getElementById('gameModalTitle').innerText = '⚔️ Апгрейд';
-        stage.innerHTML = `
-          <div style="background:#11131f; border-radius:18px; padding:24px; text-align:center; border:1px solid #2b324d;">
-            <div id="upgWheel" style="width:130px; height:130px; border-radius:50%; border:10px solid #6c52ff; margin:0 auto 12px auto; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; transition:transform 3s cubic-bezier(0.15, 0.85, 0.25, 1);">
-              50%
-            </div>
-            <div id="upgResult" style="font-size:13px; color:#cbd5e1;">Шанс успешного апгрейда x2</div>
-          </div>
-          <div class="bet-controls">
-            <input type="number" id="upgBet" class="bet-input" value="10" min="1" />
-            <button class="action-btn" onclick="runUpgrade()">Апгрейд x2</button>
-          </div>
-        `;
-      }
-
-      // 3. МИНЫ
-      if (type === 'mines') {
-        document.getElementById('gameModalTitle').innerText = '💣 Мины (3 бомбы)';
-        stage.innerHTML = `
-          <div id="minesInfo" style="text-align:center; font-size:13px; color:#94a3b8;">Нажмите Старт для начала раунда</div>
-          <div class="mines-board" id="minesBoard"></div>
-          <div class="bet-controls">
-            <input type="number" id="minesBet" class="bet-input" value="10" min="1" />
-            <button class="action-btn" id="minesActionBtn" onclick="startMines()">Играть</button>
-          </div>
-        `;
-        renderEmptyMines();
-      }
-
-      // 4. PLINKO
-      if (type === 'plinko') {
-        document.getElementById('gameModalTitle').innerText = '🔮 Plinko';
-        stage.innerHTML = `
-          <div style="background:#11131f; border-radius:18px; padding:20px 10px; text-align:center; border:1px solid #2b324d;">
-            <div id="plinkoBallArea" style="height:110px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; font-size:18px;">
-              <div>• • •</div>
-              <div>• • • • •</div>
-              <div>• • • • • • •</div>
-            </div>
-            <div style="display:flex; gap:4px; justify-content:center; margin-top:12px;">
-              <span style="background:#ef4444; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800;">0.2x</span>
-              <span style="background:#f59e0b; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800;">0.5x</span>
-              <span style="background:#10b981; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800;">1.5x</span>
-              <span style="background:#8b5cf6; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800;">3.0x</span>
-            </div>
-            <div id="plinkoStatus" style="margin-top:12px; font-size:13px; font-weight:700; color:#facc15;">Брось шарик!</div>
-          </div>
-          <div class="bet-controls">
-            <input type="number" id="plinkoBet" class="bet-input" value="10" min="1" />
-            <button class="action-btn" onclick="dropPlinko()">Бросить шар</button>
-          </div>
-        `;
-      }
-    }
-
-    // Логика Ракетки
-    let crashTimer = null, crashRunning = false, currentCrashMult = 1.0, activeCrashBet = 0, crashPoint = 1.0;
-    async function startCrash() {
-      const btn = document.getElementById('crashBtn');
-      if (crashRunning) {
-        // Забрать выигрыш
-        clearInterval(crashTimer);
-        crashRunning = false;
-        const win = Number((activeCrashBet * currentCrashMult).toFixed(2));
-        await changeBalanceServer(win);
-        document.getElementById('crashStatus').innerText = `Вы забрали: +${win} ⭐!`;
-        btn.innerText = 'Ставка';
-        return;
-      }
-      const bet = parseFloat(document.getElementById('crashBet').value) || 10;
-      const res = await changeBalanceServer(-bet);
-      if (!res.success) return alert(res.error);
-
-      activeCrashBet = bet;
-      currentCrashMult = 1.0;
-      crashPoint = 1.05 + Math.random() * 2.2;
-      crashRunning = true;
-      btn.innerText = 'Забрать';
-      document.getElementById('crashStatus').innerText = 'Ракета летит...';
-
-      crashTimer = setInterval(() => {
-        currentCrashMult += 0.04;
-        document.getElementById('crashMult').innerText = currentCrashMult.toFixed(2) + 'x';
-        if (currentCrashMult >= crashPoint) {
-          clearInterval(crashTimer);
-          crashRunning = false;
-          document.getElementById('crashMult').style.color = '#ef4444';
-          document.getElementById('crashStatus').innerText = '💥 Улетела!';
-          btn.innerText = 'Ставка';
-        }
-      }, 100);
-    }
-
-    // Логика Апгрейда
-    let upgDeg = 0;
-    async function runUpgrade() {
-      const bet = parseFloat(document.getElementById('upgBet').value) || 10;
-      const res = await changeBalanceServer(-bet);
-      if (!res.success) return alert(res.error);
-
-      upgDeg += 1080 + Math.floor(Math.random() * 360);
-      document.getElementById('upgWheel').style.transform = `rotate(${upgDeg}px)`;
-      document.getElementById('upgWheel').style.transform = `rotate(${upgDeg}deg)`;
-      const isWin = Math.random() < 0.35;
-      setTimeout(async () => {
-        if (isWin) {
-          await changeBalanceServer(bet * 2);
-          document.getElementById('upgResult').innerText = `🎉 Успех! Выигрыш +${bet * 2} ⭐`;
-        } else {
-          document.getElementById('upgResult').innerText = `❌ Неудача! Попробуй снова`;
-        }
-      }, 3000);
-    }
-
-    // Логика Мин
-    let minesActive = false, mineBombs = [], minesBetVal = 10, minesMult = 1.0;
-    function renderEmptyMines() {
-      const b = document.getElementById('minesBoard');
-      if (!b) return;
-      b.innerHTML = Array.from({ length: 25 }, (_, i) => `<div class="mine-tile" onclick="clickMine(${i}, this)"></div>`).join('');
-    }
-    async function startMines() {
-      const btn = document.getElementById('minesActionBtn');
-      if (minesActive) {
-        const win = Number((minesBetVal * minesMult).toFixed(2));
-        await changeBalanceServer(win);
-        minesActive = false;
-        btn.innerText = 'Играть';
-        document.getElementById('minesInfo').innerText = `Забрано: +${win} ⭐!`;
-        return;
-      }
-      const bet = parseFloat(document.getElementById('minesBet').value) || 10;
-      const res = await changeBalanceServer(-bet);
-      if (!res.success) return alert(res.error);
-
-      minesBetVal = bet;
-      minesMult = 1.0;
-      minesActive = true;
-      mineBombs = [];
-      while (mineBombs.length < 4) {
-        const r = Math.floor(Math.random() * 25);
-        if (!mineBombs.includes(r)) mineBombs.push(r);
-      }
-      renderEmptyMines();
-      btn.innerText = 'Забрать';
-      document.getElementById('minesInfo').innerText = 'Открывай кристаллы!';
-    }
-    function clickMine(idx, el) {
-      if (!minesActive || el.innerText !== '') return;
-      if (mineBombs.includes(idx)) {
-        el.classList.add('boom');
-        el.innerText = '💣';
-        minesActive = false;
-        document.getElementById('minesActionBtn').innerText = 'Играть';
-        document.getElementById('minesInfo').innerText = '💥 Взрыв на мине!';
-      } else {
-        el.classList.add('safe');
-        el.innerText = '💎';
-        minesMult += 0.25;
-        document.getElementById('minesInfo').innerText = `Множитель: ${minesMult.toFixed(2)}x`;
-      }
-    }
-
-    // Логика Plinko
-    async function dropPlinko() {
-      const bet = parseFloat(document.getElementById('plinkoBet').value) || 10;
-      const res = await changeBalanceServer(-bet);
-      if (!res.success) return alert(res.error);
-
-      const mults = [0.2, 0.5, 0.2, 1.5, 0.5, 3.0];
-      const m = mults[Math.floor(Math.random() * mults.length)];
-      document.getElementById('plinkoStatus').innerText = '🔮 Шарик падает...';
-      setTimeout(async () => {
-        const win = Number((bet * m).toFixed(2));
-        await changeBalanceServer(win);
-        document.getElementById('plinkoStatus').innerText = `Луза ${m}x! Выигрыш: +${win} ⭐`;
-      }, 900);
-    }
-
-    // ================= СПОНСОРСКИЕ ЗАДАНИЯ (+0.4 ⭐) =================
-    const SPONSOR_TASKS = [
-      { id: 'sp_1', title: 'Канал Спонсора #1', link: 'https://t.me/telegram' },
-      { id: 'sp_2', title: 'Бот Партнера #2', link: 'https://t.me/BotFather' },
-      { id: 'sp_3', title: 'Канал Спонсора #3', link: 'https://t.me/durov' },
-      { id: 'sp_4', title: 'Бот Партнера #4', link: 'https://t.me/userinfobot' },
-      { id: 'sp_5', title: 'VIP Канал #5', link: 'https://t.me/telegram' }
-    ];
-    let completedTasks = [], spIdx = 0, spWaitingCheck = false;
+    let completedTasks = [];
+    let spWaitingCheck = false;
 
     function renderSponsorBox() {
       const box = document.getElementById('sponsorTaskBox');
-      const avail = SPONSOR_TASKS.filter(t => !completedTasks.includes(t.id));
-      if (avail.length === 0) {
-        box.innerHTML = `<div style="text-align:center; font-weight:700;">Все 5 заданий выполнены ✓</div>`;
+      if (completedTasks.includes(SPONSOR_CHANNEL.id)) {
+        box.innerHTML = `
+          <div style="text-align:center; padding: 6px 0;">
+            <div style="font-size:15px; font-weight:800; color:#4ade80; margin-bottom:4px;">✓ Вы подписаны на @dynasty_up</div>
+            <div style="font-size:12px; color:#94a3b8;">Награда +15 ⭐ успешно зачислена на ваш баланс!</div>
+          </div>
+        `;
         return;
       }
-      const task = avail[spIdx % avail.length];
+
       box.innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; color:#94a3b8;">
-          <span>Доступно: ${avail.length}</span>
-          <span style="color:#facc15; font-weight:800;">+0.4 ⭐</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:12px; color:#94a3b8; font-weight:600;">Спонсорское задание</span>
+          <span style="background:rgba(250,204,21,0.15); color:#facc15; padding:3px 9px; border-radius:8px; font-size:12px; font-weight:800;">+${SPONSOR_CHANNEL.reward} ⭐</span>
         </div>
-        <div style="font-size:16px; font-weight:800; margin-bottom:12px;">${task.title}</div>
-        <div class="bet-controls">
-          <button class="action-btn" style="background:#262c45; flex:1;" onclick="spWaitingCheck=false; spIdx++; renderSponsorBox();">Пропустить</button>
-          <button class="action-btn" style="flex:1.6;" onclick="doSponsorAction('${task.id}', '${task.link}')">${spWaitingCheck ? 'Проверить' : 'Подписаться'}</button>
-        </div>
+        <div style="font-size:16px; font-weight:800; margin-bottom:4px;">${SPONSOR_CHANNEL.title}</div>
+        <div style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Подпишись на наш канал <strong>@dynasty_up</strong> и получи +${SPONSOR_CHANNEL.reward} ⭐ на баланс!</div>
+        <button class="action-btn" style="width:100%;" onclick="doSponsorAction()">
+          ${spWaitingCheck ? 'Проверить подписку' : 'Подписаться (@dynasty_up)'}
+        </button>
       `;
     }
 
-    async function doSponsorAction(id, link) {
+    async function doSponsorAction() {
       if (!spWaitingCheck) {
-        window.open(link, '_blank');
+        if (tg?.openTelegramLink) {
+          tg.openTelegramLink(SPONSOR_CHANNEL.link);
+        } else {
+          window.open(SPONSOR_CHANNEL.link, '_blank');
+        }
         spWaitingCheck = true;
         renderSponsorBox();
       } else {
-        const res = await fetch(`${API_URL}/claim-sponsor`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tg_id: userId, task_id: id, reward: 0.4 })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert('Начислено +0.4 ⭐!');
-          updateBalanceUI(data.newBalance);
-          completedTasks.push(id);
-          spWaitingCheck = false;
-          renderSponsorBox();
-        } else alert(data.error);
+        try {
+          const res = await fetch(`${API_URL}/claim-sponsor`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tg_id: userId,
+              task_id: SPONSOR_CHANNEL.id,
+              reward: SPONSOR_CHANNEL.reward
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert(`Подписка подтверждена! Начислено +${data.reward} ⭐`);
+            updateBalanceUI(data.newBalance);
+            completedTasks.push(SPONSOR_CHANNEL.id);
+            spWaitingCheck = false;
+            renderSponsorBox();
+          } else {
+            alert(data.error);
+          }
+        } catch (e) {
+          alert('Ошибка связи с сервером');
+        }
       }
+    }
+
+    // Модалка "Скоро..."
+    function openSoonModal(sectionName) {
+      document.getElementById('soonTitle').innerText = `${sectionName} — Скоро...`;
+      openModal('soonModal');
     }
 
     // Навигация и утилиты
@@ -1191,30 +960,27 @@
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-    function setCurrency(sym, color, el) {
-      document.querySelectorAll('.curr-option').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      const b = document.getElementById('currBadge');
-      b.innerText = sym;
-      b.style.background = color;
-    }
-
     function updateBalanceUI(val) {
       document.getElementById('balance').innerText = val;
-      document.getElementById('modalStarBal').innerText = val;
     }
 
     async function claimDaily() {
-      const res = await fetch(`${API_URL}/claim-daily`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tg_id: userId })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(`Подарок получен: +${data.reward} ⭐`);
-        updateBalanceUI(data.newBalance);
-      } else alert(data.error);
+      try {
+        const res = await fetch(`${API_URL}/claim-daily`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tg_id: userId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Бонус получен: +${data.reward} ⭐`);
+          updateBalanceUI(data.newBalance);
+        } else {
+          alert(data.error);
+        }
+      } catch (e) {
+        alert('Сервер обновляется, попробуйте через минуту');
+      }
     }
 
     async function loadUser() {
@@ -1224,7 +990,9 @@
         updateBalanceUI(data.balance);
         completedTasks = data.completedTasks || [];
         renderSponsorBox();
-      } catch (e) { renderSponsorBox(); }
+      } catch (e) {
+        renderSponsorBox();
+      }
     }
 
     renderShopCases();
