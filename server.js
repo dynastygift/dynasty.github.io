@@ -1,20 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
-const TelegramBot = require('node-telegram-bot-api');
 
-// Интегрированный токен Telegram-бота
-const TOKEN = process.env.BOT_TOKEN || '8848667688:AAGht8-Xn6VF0-rduYQ0qkqvn1l5cVDS3-k';
-
-let bot = null;
-try {
-  if (TOKEN) {
-    bot = new TelegramBot(TOKEN, { polling: true });
-    console.log('Telegram Bot успешно запущен в режиме polling!');
-  }
-} catch (e) {
-  console.log('Ошибка инициализации Telegram бота:', e.message);
-}
+const TOKEN = '8848667688:AAGht8-Xn6VF0-rduYQ0qkqvn1l5cVDS3-k';
+const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 
 const app = express();
 app.use(cors());
@@ -42,51 +31,95 @@ db.serialize(() => {
 
 const formatBal = (v) => Number((Number(v) || 0).toFixed(2));
 
-// Тексты для бота
-const TIKTOK_CONTEST_TEXT = `🎁 <b>Конкурс: Бесплатный рандомный NFT от DynastyUp!</b>\n\nВыполни простые условия в TikTok и получи случайный Telegram-подарок (Plush Pepe, Cupid Charm, Desk Calendar или Diamond Ring):\n\n1️⃣ <b>Поиск:</b> Вбей в TikTok <em>«подарки тг»</em>, <em>«телеграм подарки»</em> или <em>«бесплатные подарки»</em>.\n2️⃣ <b>30 комментариев:</b> Напиши под 30 разными видео комментарии вроде: <code>@DynastyUp реально работает</code>, <code>@DynastyUp имба</code>.\n3️⃣ <b>Актив:</b> Пролайкай 30 чужих комментов с упоминанием @DynastyUp и ответь на 10 из них.\n\n📸 Сделай скриншоты и отправь их модератору: @alisamoderator`;
+// Автономный опрос Telegram (Long Polling без сторонних библиотек)
+let lastUpdateId = 0;
+async function pollTelegram() {
+  try {
+    const response = await fetch(`${TELEGRAM_API}/getUpdates?offset=${lastUpdateId + 1}&timeout=30`);
+    const data = await response.json();
 
-const SPONSOR_TASK_TEXT = `⭐ <b>Заработать звёзды в DynastyUp</b>\n\nПодпишись на наш официальный канал и получи гарантированные <b>+15 ⭐</b> на баланс для открытия кейсов!\n\n👉 Ссылка на канал: @dynasty_up`;
+    if (data.ok && data.result) {
+      for (const update of data.result) {
+        lastUpdateId = update.update_id;
 
-// ОБРАБОТКА КОМАНД И КНОПОК БОТА
-if (bot) {
-  bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    const name = msg.from.first_name || 'Путник';
+        // Обработка текстовых сообщений (/start)
+        if (update.message && update.message.text) {
+          const chatId = update.message.chat.id;
+          const text = update.message.text;
+          const name = update.message.from.first_name || 'Путник';
 
-    const welcomeMessage = `👋 Привет, <b>${name}</b>!\n\nДобро пожаловать в официальный бот <b>DynastyUp</b> — твою любимую экосистему кейсов со звёздами, мини-игр и эксклюзивных подарков!\n\n🔥 <b>Конкурс недели:</b> Выигрывай бесплатные Telegram NFT за актив в TikTok (подробности ниже).\n\nИспользуй кнопки ниже для удобного управления и заработка:`;
-
-    const inlineKeyboard = {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: '🎁 Получить бесплатный NFT', callback_data: 'btn_free_nft' }],
-          [{ text: '⭐ Заработать звезды', callback_data: 'btn_earn_stars' }]
-        ]
-      }
-    };
-
-    bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'HTML', ...inlineKeyboard });
-  });
-
-  bot.on('callback_query', (query) => {
-    const chatId = query.message.chat.id;
-    const data = query.data;
-
-    if (data === 'btn_free_nft') {
-      bot.sendMessage(chatId, TIKTOK_CONTEST_TEXT, { parse_mode: 'HTML' });
-    } else if (data === 'btn_earn_stars') {
-      const keyboard = {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📢 Подписаться на @dynasty_up', url: 'https://t.me/dynasty_up' }]
-          ]
+          if (text.startsWith('/start')) {
+            await sendTelegramMessage(chatId, 
+              `👋 Привет, <b>${name}</b>!\n\nДобро пожаловать в официальный бот <b>DynastyUp</b> — твою экосистему кейсов со звёздами, мини-игр и эксклюзивных подарков!\n\n🔥 <b>Конкурс недели:</b> Выигрывай бесплатные Telegram NFT за актив в TikTok.\n\nИспользуй кнопки ниже:`,
+              {
+                inline_keyboard: [
+                  [{ text: '🎁 Получить бесплатный NFT', callback_data: 'btn_free_nft' }],
+                  [{ text: '⭐ Заработать звезды', callback_data: 'btn_earn_stars' }]
+                ]
+              }
+            );
+          }
         }
-      };
-      bot.sendMessage(chatId, SPONSOR_TASK_TEXT, { parse_mode: 'HTML', ...keyboard });
-    }
 
-    bot.answerCallbackQuery(query.id);
-  });
+        // Обработка нажатий на инлайн-кнопки
+        if (update.callback_query) {
+          const query = update.callback_query;
+          const chatId = query.message.chat.id;
+          const dataKey = query.data;
+
+          if (dataKey === 'btn_free_nft') {
+            await sendTelegramMessage(chatId, 
+              `🎁 <b>Конкурс: Бесплатный рандомный NFT от DynastyUp!</b>\n\nВыполни простые условия в TikTok и получи случайный Telegram-подарок (Plush Pepe, Cupid Charm, Desk Calendar или Diamond Ring):\n\n1️⃣ <b>Поиск:</b> Вбей в TikTok <em>«подарки тг»</em>, <em>«телеграм подарки»</em> или <em>«бесплатные подарки»</em>.\n2️⃣ <b>30 комментариев:</b> Напиши под 30 разными видео комментарии: <code>@DynastyUp реально работает</code>, <code>@DynastyUp имба</code>.\n3️⃣ <b>Актив:</b> Пролайкай 30 чужих комментов с упоминанием @DynastyUp и ответь на 10 из них.\n\n📸 Сделай скриншоты и отправь их модератору: @alisamoderator`
+            );
+          } else if (dataKey === 'btn_earn_stars') {
+            await sendTelegramMessage(chatId, 
+              `⭐ <b>Заработать звёзды в DynastyUp</b>\n\nПодпишись на наш официальный канал и получи гарантированные <b>+15 ⭐</b> на баланс для открытия кейсов!`,
+              {
+                inline_keyboard: [
+                  [{ text: '📢 Подписаться на @dynasty_up', url: 'https://t.me/dynasty_up' }]
+                ]
+              }
+            );
+          }
+
+          // Подтверждаем нажатие кнопки в Telegram, чтобы убрать часики
+          await fetch(`${TELEGRAM_API}/answerCallbackQuery`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ callback_query_id: query.id })
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.log('Telegram polling error:', err.message);
+  }
+  
+  // Повторяем цикл опроса
+  setTimeout(pollTelegram, 1000);
 }
+
+async function sendTelegramMessage(chatId, text, replyMarkup = null) {
+  try {
+    const body = {
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'HTML'
+    };
+    if (replyMarkup) body.reply_markup = replyMarkup;
+
+    await fetch(`${TELEGRAM_API}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (e) {
+    console.log('Send message error:', e.message);
+  }
+}
+
+// Запускаем цикл опроса бота при старте сервера
+setTimeout(pollTelegram, 2000);
 
 // REST API ДЛЯ MINI APP
 app.get('/api/user/:id', (req, res) => {
@@ -211,4 +244,4 @@ app.get('/api/admin/set-balance', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`DynastyUp Server & Bot started on port ${PORT}`));
+app.listen(PORT, () => console.log(`DynastyUp Server & Native Bot started on port ${PORT}`));
