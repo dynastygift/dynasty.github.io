@@ -28,6 +28,55 @@ db.serialize(() => {
 
 const formatBal = (v) => Number((Number(v) || 0).toFixed(2));
 
+// Таблица кейсов и честных шансов выпадения звезд
+const CASES_CONFIG = {
+  10: [
+    { stars: 5, chance: 45 },
+    { stars: 10, chance: 30 },
+    { stars: 15, chance: 15 },
+    { stars: 25, chance: 8 },
+    { stars: 50, chance: 2 }
+  ],
+  25: [
+    { stars: 10, chance: 45 },
+    { stars: 20, chance: 30 },
+    { stars: 35, chance: 15 },
+    { stars: 50, chance: 8 },
+    { stars: 100, chance: 2 }
+  ],
+  50: [
+    { stars: 20, chance: 45 },
+    { stars: 40, chance: 30 },
+    { stars: 75, chance: 15 },
+    { stars: 100, chance: 8 },
+    { stars: 250, chance: 2 }
+  ],
+  100: [
+    { stars: 40, chance: 45 },
+    { stars: 80, chance: 30 },
+    { stars: 150, chance: 15 },
+    { stars: 250, chance: 8 },
+    { stars: 500, chance: 2 }
+  ],
+  250: [
+    { stars: 100, chance: 45 },
+    { stars: 200, chance: 30 },
+    { stars: 350, chance: 15 },
+    { stars: 500, chance: 8 },
+    { stars: 1000, chance: 2 }
+  ]
+};
+
+function rollStarsByChance(drops) {
+  const rand = Math.random() * 100;
+  let cumulative = 0;
+  for (const item of drops) {
+    cumulative += item.chance;
+    if (rand <= cumulative) return item.stars;
+  }
+  return drops[0].stars;
+}
+
 // 1. Получение профиля
 app.get('/api/user/:id', (req, res) => {
   const tgId = String(req.params.id);
@@ -50,14 +99,14 @@ app.get('/api/user/:id', (req, res) => {
   });
 });
 
-// 2. Ежедневный бесплатный кейс / бонус (2-5 звезд)
+// 2. Ежедневный бесплатный бонус (5-15 звезд раз в 24 часа)
 app.post('/api/claim-daily', (req, res) => {
   const tg_id = String(req.body.tg_id);
   const now = Math.floor(Date.now() / 1000);
   const COOLDOWN = 24 * 60 * 60;
 
   db.get('SELECT * FROM users WHERE tg_id = ?', [tg_id], (err, user) => {
-    const reward = Math.floor(Math.random() * 4) + 2;
+    const reward = Math.floor(Math.random() * 11) + 5; // от 5 до 15 ⭐
 
     if (!user) {
       db.run('INSERT INTO users (tg_id, balance, last_daily) VALUES (?, ?, ?)', [tg_id, reward, now], () => {
@@ -67,7 +116,7 @@ app.post('/api/claim-daily', (req, res) => {
     }
 
     if (now - user.last_daily < COOLDOWN) {
-      return res.status(400).json({ error: 'Бесплатный подарок доступен раз в 24 часа!' });
+      return res.status(400).json({ error: 'Бесплатный бонус доступен раз в 24 часа!' });
     }
 
     const newBalance = formatBal(user.balance + reward);
@@ -77,14 +126,14 @@ app.post('/api/claim-daily', (req, res) => {
   });
 });
 
-// 3. Задания спонсоров (+0.4 звезды)
+// 3. Подписка на спонсора https://t.me/dynasty_up
 app.post('/api/claim-sponsor', (req, res) => {
   const tg_id = String(req.body.tg_id);
   const task_id = String(req.body.task_id);
-  const reward = parseFloat(req.body.reward) || 0.4;
+  const reward = parseFloat(req.body.reward) || 15;
 
   db.get('SELECT 1 FROM completed_tasks WHERE tg_id = ? AND task_id = ?', [tg_id, task_id], (err, exists) => {
-    if (exists) return res.status(400).json({ error: 'Уже выполнено!' });
+    if (exists) return res.status(400).json({ error: 'Вы уже получили награду за этот канал!' });
 
     db.run('INSERT INTO completed_tasks (tg_id, task_id) VALUES (?, ?)', [tg_id, task_id], (err) => {
       if (err) return res.status(500).json({ error: 'Ошибка БД' });
@@ -102,17 +151,22 @@ app.post('/api/claim-sponsor', (req, res) => {
   });
 });
 
-// 4. Открытие платных кейсов (выдает строго 2-5 утешительных единиц)
+// 4. Открытие кейсов на Звёзды по таблице шансов
 app.post('/api/open-case', (req, res) => {
   const tg_id = String(req.body.tg_id);
-  const price = parseFloat(req.body.price);
+  const price = parseInt(req.body.price, 10);
+  const drops = CASES_CONFIG[price];
+
+  if (!drops) {
+    return res.status(400).json({ error: 'Кейс не найден' });
+  }
 
   db.get('SELECT * FROM users WHERE tg_id = ?', [tg_id], (err, user) => {
     if (!user || user.balance < price) {
-      return res.status(400).json({ error: `Недостаточно средств! Нужно ${price}` });
+      return res.status(400).json({ error: `Недостаточно звёзд! Нужно ${price} ⭐` });
     }
 
-    const rewardStars = Math.floor(Math.random() * 4) + 2;
+    const rewardStars = rollStarsByChance(drops);
     const newBalance = formatBal(user.balance - price + rewardStars);
 
     db.run('UPDATE users SET balance = ? WHERE tg_id = ?', [newBalance, tg_id], () => {
@@ -121,26 +175,7 @@ app.post('/api/open-case', (req, res) => {
   });
 });
 
-// 5. Изменение баланса в мини-играх (списание ставки / зачисление выигрыша)
-app.post('/api/game-action', (req, res) => {
-  const tg_id = String(req.body.tg_id);
-  const delta = parseFloat(req.body.delta); // отрицательное = ставка, положительное = выигрыш
-
-  db.get('SELECT * FROM users WHERE tg_id = ?', [tg_id], (err, user) => {
-    const currentBal = user ? user.balance : 0;
-    if (delta < 0 && currentBal < Math.abs(delta)) {
-      return res.status(400).json({ error: 'Недостаточно средств на балансе!' });
-    }
-    const newBalance = formatBal(Math.max(0, currentBal + delta));
-    db.run(
-      'INSERT INTO users (tg_id, balance, last_daily) VALUES (?, ?, 0) ON CONFLICT(tg_id) DO UPDATE SET balance = ?',
-      [tg_id, newBalance, newBalance],
-      () => res.json({ success: true, newBalance })
-    );
-  });
-});
-
-// 6. Админ-ручка для накрутки себе баланса
+// 5. Админ-ручка для начисления звезд:
 // /api/admin/set-balance?admin_key=dynasty777&tg_id=ID&stars=1000
 app.get('/api/admin/set-balance', (req, res) => {
   const { admin_key, tg_id, stars } = req.query;
@@ -149,9 +184,9 @@ app.get('/api/admin/set-balance', (req, res) => {
   db.run(
     'INSERT INTO users (tg_id, balance, last_daily) VALUES (?, ?, 0) ON CONFLICT(tg_id) DO UPDATE SET balance = ROUND(balance + ?, 2)',
     [String(tg_id), amount, amount],
-    () => res.json({ success: true, message: `Начислено ${amount}` })
+    () => res.json({ success: true, message: `Начислено ${amount} ⭐` })
   );
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Dynasty Server started on ${PORT}`));
+app.listen(PORT, () => console.log(`DynastyUp Server started on ${PORT}`));
