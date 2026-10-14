@@ -8,7 +8,7 @@ app.use(express.json());
 
 const db = new sqlite3.Database('./database.sqlite');
 
-// Создание таблицы пользователей
+// Таблица базы данных
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     tg_id TEXT PRIMARY KEY,
@@ -17,7 +17,7 @@ db.run(`
   )
 `);
 
-// 1. Получить профиль
+// 1. Получение баланса профиля
 app.get('/api/user/:id', (req, res) => {
   const tgId = String(req.params.id);
   db.get('SELECT * FROM users WHERE tg_id = ?', [tgId], (err, row) => {
@@ -31,7 +31,7 @@ app.get('/api/user/:id', (req, res) => {
   });
 });
 
-// 2. Ежедневный кейс (бонус 2-5 звезд)
+// 2. Ежедневный бонус (2-5 звезд раз в 24 часа)
 app.post('/api/claim-daily', (req, res) => {
   const tg_id = String(req.body.tg_id);
   const now = Math.floor(Date.now() / 1000);
@@ -47,7 +47,7 @@ app.post('/api/claim-daily', (req, res) => {
     }
 
     if (now - user.last_daily < COOLDOWN) {
-      return res.status(400).json({ error: 'Бонус доступен раз в 24 часа!' });
+      return res.status(400).json({ error: 'Бонус доступен 1 раз в 24 часа!' });
     }
 
     const reward = Math.floor(Math.random() * 4) + 2;
@@ -59,7 +59,8 @@ app.post('/api/claim-daily', (req, res) => {
   });
 });
 
-// 3. Открытие платных кейсов (100, 300, 500, 750, 1000 ⭐)
+// 3. Открытие платных кейсов (100, 300, 500, 750, 1000)
+// ВЫДАЕТ СТРОГО 2-5 ЗВЕЗД В КАЧЕСТВЕ УТЕШИТЕЛЬНОГО ПРИЗА
 app.post('/api/open-case', (req, res) => {
   const tg_id = String(req.body.tg_id);
   const price = parseInt(req.body.price, 10);
@@ -74,14 +75,13 @@ app.post('/api/open-case', (req, res) => {
       return res.status(400).json({ error: `Недостаточно звезд! Требуется ${price} ⭐` });
     }
 
-    // СТРОГОЕ ПРАВИЛО: Выпадает ВСЕГДА только 2-5 звезд, никаких NFT!
-    const rewardStars = Math.floor(Math.random() * 4) + 2; // 2, 3, 4 или 5
+    // Алгоритм утешительного приза: строго 2, 3, 4 или 5 звезд
+    const rewardStars = Math.floor(Math.random() * 4) + 2;
     const newBalance = user.balance - price + rewardStars;
 
     db.run('UPDATE users SET balance = ? WHERE tg_id = ?', [newBalance, tg_id], () => {
       res.json({
         success: true,
-        prize: `${rewardStars} ⭐ (Утешительный приз)`,
         rewardStars: rewardStars,
         newBalance: newBalance
       });
@@ -89,11 +89,11 @@ app.post('/api/open-case', (req, res) => {
   });
 });
 
-// Секретная админка для накрутки баланса:
-// /api/admin/set-balance?admin_key=dynasty777&tg_id=ID&stars=1000
+// 4. Секретная ссылка для накрутки баланса администратору
+// /api/admin/set-balance?admin_key=dynasty777&tg_id=ТВОЙ_ID&stars=1000
 app.get('/api/admin/set-balance', (req, res) => {
   const { admin_key, tg_id, stars } = req.query;
-  if (admin_key !== 'dynasty777') return res.status(403).json({ error: 'Запрещено' });
+  if (admin_key !== 'dynasty777') return res.status(403).json({ error: 'Доступ запрещен' });
   if (!tg_id || !stars) return res.status(400).json({ error: 'Укажите tg_id и stars' });
 
   const amount = parseInt(stars, 10);
