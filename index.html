@@ -6,189 +6,313 @@
   <title>Dynasty Gifts</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: radial-gradient(circle at 50% -20%, #2f194f 0%, #0c0e17 55%, #05060a 100%);
-      color: #fff;
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
       margin: 0;
-      padding: 16px 14px 90px 14px;
-      text-align: center;
-      user-select: none;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background: #090a0c;
+      color: #f1f3f5;
       min-height: 100vh;
-      position: relative;
+      padding: 20px 16px 95px 16px;
       overflow-x: hidden;
+      user-select: none;
     }
 
-    /* Фоновые градиентные сферы */
-    .glow-sphere {
-      position: absolute;
-      border-radius: 50%;
+    /* Подложка с плавными монохромными градиентами */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 420px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(50, 55, 65, 0.04) 60%, transparent 80%);
       filter: blur(80px);
-      z-index: 0;
       pointer-events: none;
-    }
-    .sphere-1 { width: 240px; height: 240px; background: rgba(212, 175, 55, 0.16); top: -40px; left: -50px; }
-    .sphere-2 { width: 280px; height: 280px; background: rgba(147, 51, 234, 0.22); top: 380px; right: -70px; }
-
-    .content-wrapper { position: relative; z-index: 1; }
-
-    .header-title {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      background: linear-gradient(135deg, #fff2a3 0%, #d4af37 50%, #aa771c 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      filter: drop-shadow(0 2px 10px rgba(212,175,55,0.4));
+      z-index: 0;
     }
 
-    /* Блок баланса */
-    .balance-box {
-      background: linear-gradient(135deg, rgba(32, 25, 50, 0.85) 0%, rgba(16, 18, 30, 0.95) 100%);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(212, 175, 55, 0.08);
-    }
-    .balance-val {
-      font-size: 38px;
-      font-weight: 900;
-      color: #ffd700;
-      margin: 4px 0 12px 0;
-      text-shadow: 0 0 25px rgba(255, 215, 0, 0.45);
+    .app-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 440px;
+      margin: 0 auto;
     }
 
-    /* Список кейсов */
-    .cases-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    /* Эффект Liquid Glass */
+    .liquid-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
     }
-    .case-card {
-      background: linear-gradient(160deg, rgba(26, 29, 46, 0.88) 0%, rgba(12, 14, 24, 0.96) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-top: 1px solid rgba(212, 175, 55, 0.45);
-      border-radius: 22px;
-      padding: 16px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
-      text-align: left;
-    }
-    .case-header {
+
+    /* Верхний блок: лого и профиль */
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
+      padding: 0 4px;
     }
-    .case-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: #f8fafc;
+    .header-logo {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #ffffff;
+      text-transform: uppercase;
     }
-    .case-price {
-      font-size: 16px;
-      font-weight: 900;
-      color: #ffd700;
-      background: rgba(255, 215, 0, 0.12);
-      border: 1px solid rgba(255, 215, 0, 0.35);
+    .header-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8b929d;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 4px 10px;
-      border-radius: 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
     }
 
-    /* Квадратный постер 1:1 */
-    .case-banner {
+    /* Карточка баланса */
+    .balance-card {
+      padding: 22px 20px;
+      margin-bottom: 22px;
+      text-align: left;
+    }
+    .balance-label {
+      font-size: 13px;
+      color: #7e8794;
+      font-weight: 500;
+    }
+    .balance-val {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      margin: 6px 0 16px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .balance-val span.star {
+      font-size: 24px;
+      color: #d1d5db;
+    }
+
+    /* Горизонтальный скролл табов кейсов */
+    .cases-scroll-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 18px 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .cases-scroll-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .case-tab-item {
+      flex: 0 0 auto;
+      padding: 10px 18px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      color: #8e95a2;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .case-tab-item.active {
+      background: #ffffff;
+      color: #0b0c0e;
+      border-color: #ffffff;
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+    }
+    .case-tab-item .price-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: inherit;
+    }
+    .case-tab-item.active .price-badge {
+      background: rgba(0, 0, 0, 0.12);
+      color: #0b0c0e;
+      font-weight: 700;
+    }
+
+    /* Интерактивный дисплей кейса 1:1 */
+    .case-viewer {
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+    .case-media {
       width: 100%;
       aspect-ratio: 1 / 1;
-      background: radial-gradient(circle at center, #291c47 0%, #10121d 75%);
-      border: 1px solid rgba(212, 175, 55, 0.28);
-      border-radius: 16px;
+      border-radius: 20px;
+      background: radial-gradient(circle at center, #1b1e24 0%, #0d0f12 85%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      position: relative;
       overflow: hidden;
-      margin-bottom: 14px;
-      box-shadow: inset 0 0 30px rgba(0,0,0,0.7);
+      margin-bottom: 18px;
     }
-    .case-banner img.main-art {
-      width: 68%;
-      height: 68%;
+    .case-media img {
+      width: 65%;
+      height: 65%;
       object-fit: contain;
-      filter: drop-shadow(0 14px 26px rgba(0,0,0,0.85));
-    }
-    .banner-badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: linear-gradient(90deg, #d4af37, #aa771c);
-      color: #0d0f17;
-      font-size: 10px;
-      font-weight: 900;
-      padding: 4px 9px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
+      filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.7));
+      transition: transform 0.3s ease;
     }
 
-    /* Шансы под картинкой */
-    .chances-list {
+    /* Список шансов */
+    .chances-container {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
     }
-    .chance-pill {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 8px;
-      padding: 4px 8px;
+    .chance-chip {
       font-size: 11px;
-      color: #94a3b8;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      color: #8b93a0;
     }
-    .chance-pill.gold {
-      color: #ffd700;
-      border-color: rgba(255, 215, 0, 0.45);
-      background: rgba(255, 215, 0, 0.1);
-      font-weight: bold;
+    .chance-chip.highlight {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
     }
 
-    /* Кнопки */
-    .btn-row {
+    /* Кнопки управления */
+    .btn-group {
       display: flex;
       gap: 10px;
     }
     button {
       border: none;
-      border-radius: 12px;
+      outline: none;
       font-size: 14px;
-      font-weight: 800;
-      padding: 14px;
+      font-weight: 700;
+      padding: 15px;
+      border-radius: 16px;
       cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      flex: 2;
+      background: #ffffff;
+      color: #090a0c;
+      box-shadow: 0 6px 24px rgba(255, 255, 255, 0.18);
+    }
+    .btn-secondary {
+      flex: 1.1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #d1d5db;
+    }
+    .btn-daily {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 13px;
+    }
+
+    /* Нижний Liquid Glass Tabbar */
+    .tabbar {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 420px;
+      height: 64px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      z-index: 100;
+      border-radius: 28px;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: #6c7582;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 8px 24px;
+      cursor: pointer;
+      border-radius: 20px;
       transition: all 0.2s;
     }
-    button:active { transform: scale(0.97); }
-    .btn-gold {
-      flex: 2;
-      background: linear-gradient(90deg, #ffd700 0%, #d4af37 50%, #b28912 100%);
-      color: #0b0e14;
-      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);
-    }
-    .btn-demo {
-      flex: 1.2;
+    .nav-btn.active {
+      color: #ffffff;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      color: #cbd5e1;
     }
-    .btn-claim {
-      width: 100%;
-      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+    .nav-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Вкладка Заданий (TikTok) */
+    .task-card {
+      padding: 24px 20px;
+      text-align: left;
+    }
+    .task-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+    .task-subtitle {
+      font-size: 13px;
+      color: #8b93a0;
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+    .step-box {
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #c4c9d1;
+      line-height: 1.5;
+    }
+    .step-box strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
     }
 
     /* Модалка рулетки */
@@ -196,8 +320,9 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.92);
-      backdrop-filter: blur(12px);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 2000;
       flex-direction: column;
       justify-content: center;
@@ -205,206 +330,161 @@
       padding: 20px;
     }
     .roulette-modal.show { display: flex; }
-    .roulette-container {
+    .roulette-box {
       width: 100%;
       max-width: 380px;
-      background: linear-gradient(160deg, #1d1730 0%, #0d0f17 100%);
-      border: 2px solid #d4af37;
-      border-radius: 24px;
-      padding: 22px 14px;
+      padding: 26px 18px;
+      text-align: center;
       position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 45px rgba(212, 175, 55, 0.35);
     }
-    .center-pointer {
+    .pointer {
       position: absolute;
-      top: 60px;
-      bottom: 65px;
+      top: 66px;
+      bottom: 74px;
       left: 50%;
-      width: 4px;
-      background: #ffd700;
+      width: 2px;
+      background: #ffffff;
       transform: translateX(-50%);
       z-index: 10;
-      box-shadow: 0 0 14px #ffd700;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
     }
-    .center-pointer::before {
-      content: "▼";
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #ffd700;
-      font-size: 14px;
-    }
-    .tape-wrapper {
+    .tape-window {
       width: 100%;
       overflow: hidden;
-      position: relative;
-      margin: 25px 0;
-      border-radius: 14px;
-      background: #08090f;
+      margin: 22px 0;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 0 25px rgba(0,0,0,0.85);
     }
-    .tape-track {
+    .tape-strip {
       display: flex;
       transform: translateX(0px);
       transition: none;
     }
-    .item-card {
-      min-width: 114px;
-      height: 130px;
-      background: rgba(255, 255, 255, 0.03);
+    .tape-item {
+      min-width: 110px;
+      height: 126px;
       margin: 6px;
-      border-radius: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 11px;
+      gap: 6px;
     }
-    .item-card img {
-      width: 56px;
-      height: 56px;
+    .tape-item img {
+      width: 50px;
+      height: 50px;
       object-fit: contain;
-      margin-bottom: 6px;
     }
-    .item-card .name { font-weight: 700; color: #fff; }
-    .item-card .badge-rarity { color: #ffd700; font-size: 10px; font-weight: bold; }
-
-    /* Таб-бар */
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 65px;
-      background: rgba(13, 14, 23, 0.94);
-      backdrop-filter: blur(15px);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 1000;
+    .tape-item .item-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #e2e8f0;
     }
-    .tab-btn {
-      background: none;
-      border: none;
-      color: #64748b;
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 6px 0;
-      cursor: pointer;
-    }
-    .tab-btn.active { color: #ffd700; font-weight: bold; }
-    .tab-btn span { font-size: 20px; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Задания TikTok */
-    .task-card {
-      background: linear-gradient(160deg, rgba(26, 29, 46, 0.92) 0%, rgba(12, 14, 24, 0.98) 100%);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      border-radius: 20px;
-      padding: 18px;
-      text-align: left;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.65);
-    }
-    .task-step {
-      margin-bottom: 14px;
-      font-size: 13px;
-      color: #cbd5e1;
-      line-height: 1.45;
-    }
-    .task-step strong { color: #ffd700; }
   </style>
 </head>
 <body>
 
-  <div class="glow-sphere sphere-1"></div>
-  <div class="glow-sphere sphere-2"></div>
-
-  <div class="content-wrapper">
-    <div class="header-title">Dynasty Gifts</div>
-
-    <!-- ТАБ 1: КЕЙСЫ -->
-    <div id="tab-cases" class="tab-content active">
-      <div class="balance-box">
-        <div style="font-size: 13px; color: #94a3b8; font-weight: 600;">Баланс пользователя</div>
-        <div class="balance-val"><span id="balance">0</span> ⭐</div>
-        <button class="btn-claim" onclick="claimDaily()">🎁 Забрать бонус (2-5 ⭐ раз в 24ч)</button>
-      </div>
-
-      <div class="cases-grid" id="cases-grid"></div>
+  <div class="app-wrapper">
+    <!-- Шапка -->
+    <div class="header">
+      <div class="header-logo">Dynasty</div>
+      <div class="header-tag">Exclusive</div>
     </div>
 
-    <!-- ТАБ 2: ЗАДАНИЯ TIKTOK -->
+    <!-- ВКЛАДКА 1: КЕЙСЫ -->
+    <div id="tab-cases" class="tab-content active">
+      <!-- Баланс -->
+      <div class="balance-card liquid-glass">
+        <div class="balance-label">Доступный баланс</div>
+        <div class="balance-val"><span id="balance">0</span> <span class="star">⭐</span></div>
+        <button class="btn-daily" onclick="claimDaily()">Забрать ежедневный бонус</button>
+      </div>
+
+      <!-- Горизонтальные вкладки кейсов -->
+      <div class="cases-scroll-tabs" id="casesTabs"></div>
+
+      <!-- Интерфейс активного кейса -->
+      <div class="case-viewer liquid-glass">
+        <div class="case-media">
+          <img id="activeCaseImg" src="" alt="Case Item" />
+        </div>
+
+        <div class="chances-container" id="activeChances"></div>
+
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="spinCurrentCase(true)">Демо</button>
+          <button class="btn-primary" id="openCaseBtn" onclick="spinCurrentCase(false)">Открыть</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ВКЛАДКА 2: ЗАДАНИЯ TIKTOK -->
     <div id="tab-nft" class="tab-content">
-      <div class="task-card">
-        <div style="background: rgba(212,175,55,0.18); color: #ffd700; padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block;">АКЦИЯ В TIKTOK</div>
-        <h3 style="margin: 10px 0; color: #fff;">Бесплатный Telegram NFT</h3>
-        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 14px;">Выполни все условия в TikTok, сделай скриншоты и отправь их модератору для выдачи NFT:</div>
+      <div class="task-card liquid-glass">
+        <div class="task-title">Бесплатный Telegram NFT</div>
+        <div class="task-subtitle">Выполни действия по продвижению в TikTok и отправь отчет модератору:</div>
 
-        <div class="task-step">
-          <strong>1. Поиск:</strong> Вбей в поиск TikTok одну из фраз:<br>
-          <em>«подарки тг»</em>, <em>«телеграм подарки»</em> или <em>«бесплатные подарки»</em>.
+        <div class="step-box">
+          <strong>1. Поиск</strong>
+          Вбей в поиске TikTok: «подарки тг», «телеграм подарки» или «бесплатные подарки».
         </div>
 
-        <div class="task-step">
-          <strong>2. 30 комментариев:</strong> Напиши под 30 разными видео комментарии по типу:<br>
-          • <em>@DynastyGiftBot реально работает</em><br>
-          • <em>без рофла, @DynastyGiftBot имба</em><br>
-          • <em>@DynastyGiftBot я тут получил)</em>
+        <div class="step-box">
+          <strong>2. 30 комментариев</strong>
+          Оставь комментарии под 30 разными видео:
+          <br>• @DynastyGiftBot реально работает
+          <br>• без рофла, @DynastyGiftBot имба
+          <br>• @DynastyGiftBot я тут получил)
         </div>
 
-        <div class="task-step">
-          <strong>3. Лайки:</strong> Найди и пролайкай 30 других комментариев с упоминанием <em>@DynastyGiftBot</em>.
+        <div class="step-box">
+          <strong>3. Лайки</strong>
+          Найди и пролайкай 30 других комментариев с упоминанием @DynastyGiftBot.
         </div>
 
-        <div class="task-step">
-          <strong>4. 10 ответов:</strong> Ответь на 10 комментариев фразами:<br>
-          • <em>спасибо!!</em><br>
-          • <em>реально работает</em><br>
-          • <em>боже спасибо</em>
+        <div class="step-box">
+          <strong>4. 10 ответов</strong>
+          Ответь на 10 комментариев: «спасибо!!», «реально работает» или «боже спасибо».
         </div>
 
-        <div class="task-step">
-          <strong>5. Скриншоты:</strong> Заскринь все свои 30 комментариев, пролайканные отзывы и ответы.
+        <div class="step-box">
+          <strong>5. Отчет</strong>
+          Сделай скриншоты всех действий и отправь модератору.
         </div>
 
         <a href="https://t.me/alisamoderator" target="_blank" style="text-decoration: none;">
-          <button class="btn-gold" style="width: 100%; margin-top: 10px;">Отправить скриншоты (@alisamoderator)</button>
+          <button class="btn-primary" style="width: 100%; margin-top: 10px;">Отправить скриншоты</button>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- МОДАЛКА РУЛЕТКИ -->
+  <!-- РУЛЕТКА -->
   <div id="rouletteModal" class="roulette-modal">
-    <div class="roulette-container">
-      <h3 id="modalTitle" style="margin: 0; color: #ffd700;">Открытие кейса</h3>
-      <div class="center-pointer"></div>
-      <div class="tape-wrapper">
-        <div id="tapeTrack" class="tape-track"></div>
+    <div class="roulette-box liquid-glass">
+      <div style="font-size: 15px; font-weight: 700; color: #ffffff;" id="modalTitle">Открытие</div>
+      <div class="pointer"></div>
+      <div class="tape-window">
+        <div id="tapeStrip" class="tape-strip"></div>
       </div>
-      <div id="spinResult" style="min-height: 24px; font-weight: bold; margin-bottom: 14px; font-size: 15px; color: #fff;"></div>
-      <button id="closeSpinBtn" class="btn-gold" style="display: none; width: 100%;" onclick="closeRoulette()">Забрать приз</button>
+      <div id="spinResult" style="min-height: 22px; font-size: 13px; font-weight: 600; color: #a0aec0; margin-bottom: 14px;"></div>
+      <button id="closeSpinBtn" class="btn-primary" style="display: none; width: 100%;" onclick="closeRoulette()">Готово</button>
     </div>
   </div>
 
-  <!-- НИЖНИЕ ВКЛАДКИ -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('cases', this)">
-      <span>📦</span>
+  <!-- НИЖНИЙ НАВИГАЦИОННЫЙ ТАББАР -->
+  <div class="tabbar liquid-glass">
+    <button class="nav-btn active" onclick="switchNav('cases', this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>
       Кейсы
     </button>
-    <button class="tab-btn" onclick="switchTab('nft', this)">
-      <span>💎</span>
-      Бесплатный NFT
+    <button class="nav-btn" onclick="switchNav('nft', this)">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 2 8.5 12 15 22 8.5 12 2"></polygon><polygon points="2 15.5 12 22 22 15.5"></polygon></svg>
+      NFT
     </button>
   </div>
 
@@ -415,96 +495,107 @@
     const API_URL = 'https://dynasty-github-io.onrender.com/api';
     const userId = tg?.initDataUnsafe?.user?.id || 'demo_user';
 
-    // Векторные SVG-модели на едином стильном градиенте (не требуют файлов и хостинга)
-    const SVG_ICONS = {
-      gift: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%233a1e54"/><stop offset="100%" stop-color="%230f1019"/></radialGradient></defs><rect width="100" height="100" rx="20" fill="url(%23bg)"/><rect x="25" y="45" width="50" height="40" rx="6" fill="%23eab308"/><rect x="20" y="38" width="60" height="12" rx="4" fill="%23facc15"/><rect x="44" y="38" width="12" height="47" fill="%23dc2626"/><path d="M50 38 C40 20 25 35 48 38 Z" fill="%23ef4444"/><path d="M50 38 C60 20 75 35 52 38 Z" fill="%23ef4444"/></svg>`,
-      ring: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%231e293b"/><stop offset="100%" stop-color="%230b0f19"/></radialGradient></defs><rect width="100" height="100" rx="20" fill="url(%23bg2)"/><circle cx="50" cy="58" r="22" fill="none" stroke="%2394a3b8" stroke-width="8"/><circle cx="50" cy="58" r="22" fill="none" stroke="%23e2e8f0" stroke-width="3"/><path d="M38 34 L62 34 L68 42 L50 60 L32 42 Z" fill="%2338bdf8"/><path d="M42 34 L50 60 L58 34 Z" fill="%23bae6fd"/><polygon points="46,26 54,26 52,32 48,32" fill="%23ffffff"/></svg>`,
-      calendar: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg3" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%233b371b"/><stop offset="100%" stop-color="%230f1117"/></radialGradient></defs><rect width="100" height="100" rx="20" fill="url(%23bg3)"/><rect x="24" y="30" width="52" height="52" rx="8" fill="%23f8fafc"/><rect x="24" y="30" width="52" height="20" rx="8" fill="%231e293b"/><circle cx="36" cy="26" r="4" fill="%23cbd5e1"/><circle cx="64" cy="26" r="4" fill="%23cbd5e1"/><circle cx="50" cy="62" r="14" fill="%23ef4444"/><text x="50" y="67" font-size="12" font-weight="900" fill="%23ffffff" text-anchor="middle" font-family="sans-serif">18+</text></svg>`,
-      cupid: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg4" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%234a1733"/><stop offset="100%" stop-color="%230d0a14"/></radialGradient></defs><rect width="100" height="100" rx="20" fill="url(%23bg4)"/><path d="M15 48 C15 32 35 32 50 48 C65 32 85 32 85 48 C85 68 50 82 50 82 C50 82 15 68 15 48 Z" fill="%23e11d48" stroke="%23fbbf24" stroke-width="4"/><circle cx="50" cy="52" r="5" fill="%23fbbf24"/><rect x="48" y="55" width="4" height="8" fill="%23fbbf24"/><path d="M22 36 L10 24 M78 36 L90 24" stroke="%23f59e0b" stroke-width="4" stroke-linecap="round"/></svg>`,
-      pepe: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg5" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23163b22"/><stop offset="100%" stop-color="%23060d09"/></radialGradient></defs><rect width="100" height="100" rx="20" fill="url(%23bg5)"/><ellipse cx="50" cy="55" rx="30" ry="24" fill="%2322c55e"/><ellipse cx="36" cy="38" rx="10" ry="10" fill="%23eab308" stroke="%23ca8a04" stroke-width="3"/><ellipse cx="64" cy="38" rx="10" ry="10" fill="%23eab308" stroke="%23ca8a04" stroke-width="3"/><circle cx="36" cy="38" r="4" fill="%23713f12"/><circle cx="64" cy="38" r="4" fill="%23713f12"/><path d="M30 65 Q50 78 70 65" fill="none" stroke="%2315803d" stroke-width="4" stroke-linecap="round"/><path d="M42 62 C42 56 46 56 50 60 C54 56 58 56 58 62 C58 68 50 72 50 72 Z" fill="%23ef4444"/></svg>`
+    // Векторные модели
+    const ICONS = {
+      gift: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%232b2f38"/><stop offset="100%" stop-color="%2312141a"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g)"/><rect x="25" y="44" width="50" height="42" rx="8" fill="%23e2e8f0"/><rect x="20" y="36" width="60" height="12" rx="4" fill="%23cbd5e1"/><rect x="45" y="36" width="10" height="50" fill="%23475569"/><path d="M50 36 C42 22 28 32 48 36 Z" fill="%2364748b"/><path d="M50 36 C58 22 72 32 52 36 Z" fill="%2364748b"/></svg>`,
+      ring: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23262a33"/><stop offset="100%" stop-color="%23101217"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g2)"/><circle cx="50" cy="58" r="22" fill="none" stroke="%2394a3b8" stroke-width="8"/><circle cx="50" cy="58" r="22" fill="none" stroke="%23ffffff" stroke-width="2"/><polygon points="38,34 62,34 68,42 50,60 32,42" fill="%23e2e8f0"/><polygon points="42,34 50,60 58,34" fill="%23ffffff"/></svg>`,
+      calendar: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g3" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23282b36"/><stop offset="100%" stop-color="%23111318"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g3)"/><rect x="24" y="30" width="52" height="52" rx="8" fill="%23f1f5f9"/><rect x="24" y="30" width="52" height="18" rx="8" fill="%23334155"/><circle cx="36" cy="26" r="4" fill="%23cbd5e1"/><circle cx="64" cy="26" r="4" fill="%23cbd5e1"/><circle cx="50" cy="60" r="14" fill="%230f172a"/><text x="50" y="65" font-size="11" font-weight="900" fill="%23ffffff" text-anchor="middle" font-family="sans-serif">18+</text></svg>`,
+      cupid: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g4" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%232d303b"/><stop offset="100%" stop-color="%23111318"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g4)"/><path d="M20 48 C20 34 36 34 50 48 C64 34 80 34 80 48 C80 66 50 82 50 82 C50 82 20 66 20 48 Z" fill="%23e2e8f0" stroke="%2394a3b8" stroke-width="3"/><circle cx="50" cy="52" r="5" fill="%230f172a"/><rect x="48" y="55" width="4" height="8" fill="%230f172a"/></svg>`,
+      pepe: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g5" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23303440"/><stop offset="100%" stop-color="%2312141a"/></radialGradient></defs><rect width="100" height="100" rx="22" fill="url(%23g5)"/><ellipse cx="50" cy="56" rx="30" ry="24" fill="%23cbd5e1"/><ellipse cx="36" cy="38" rx="10" ry="10" fill="%23ffffff"/><ellipse cx="64" cy="38" rx="10" ry="10" fill="%23ffffff"/><circle cx="36" cy="38" r="4" fill="%230f172a"/><circle cx="64" cy="38" r="4" fill="%230f172a"/><path d="M34 66 Q50 74 66 66" fill="none" stroke="%23475569" stroke-width="4" stroke-linecap="round"/></svg>`
     };
 
     const ITEMS = {
-      gift: { name: 'Подарочек', img: SVG_ICONS.gift, badge: 'Обычный' },
-      ring: { name: 'Diamond Ring', img: SVG_ICONS.ring, badge: 'Редкий' },
-      calendar: { name: 'Desk Calendar', img: SVG_ICONS.calendar, badge: 'Эпический' },
-      cupid: { name: 'Cupid Charm', img: SVG_ICONS.cupid, badge: 'Легендарный' },
-      pepe: { name: 'Plush Pepe', img: SVG_ICONS.pepe, badge: 'Мифический' }
+      gift: { name: 'Подарочек', img: ICONS.gift },
+      ring: { name: 'Diamond Ring', img: ICONS.ring },
+      calendar: { name: 'Desk Calendar', img: ICONS.calendar },
+      cupid: { name: 'Cupid Charm', img: ICONS.cupid },
+      pepe: { name: 'Plush Pepe', img: ICONS.pepe }
     };
 
     const CASES = [
       {
+        id: 0,
+        name: 'Starter',
         price: 100,
-        title: 'Стартовый Кейс',
-        mainArt: SVG_ICONS.gift,
+        art: ICONS.gift,
         chances: [
-          { name: 'Подарочек 30%' }, { name: 'Кольцо 30%' }, { name: 'Календарь 20%' }, { name: 'Купидон 15%' }, { name: 'Пепе 5%', gold: true }
+          { text: 'Подарочек 30%' }, { text: 'Кольцо 30%' }, { text: 'Календарь 20%' }, { text: 'Купидон 15%' }, { text: 'Пепе 5%', highlight: true }
         ]
       },
       {
+        id: 1,
+        name: 'Bronze',
         price: 300,
-        title: 'Бронзовый Кейс',
-        mainArt: SVG_ICONS.ring,
+        art: ICONS.ring,
         chances: [
-          { name: 'Подарочек 20%' }, { name: 'Кольцо 25%' }, { name: 'Календарь 25%' }, { name: 'Купидон 20%' }, { name: 'Пепе 10%', gold: true }
+          { text: 'Подарочек 20%' }, { text: 'Кольцо 25%' }, { text: 'Календарь 25%' }, { text: 'Купидон 20%' }, { text: 'Пепе 10%', highlight: true }
         ]
       },
       {
+        id: 2,
+        name: 'Silver',
         price: 500,
-        title: 'Серебряный Кейс',
-        mainArt: SVG_ICONS.calendar,
+        art: ICONS.calendar,
         chances: [
-          { name: 'Подарочек 10%' }, { name: 'Кольцо 20%' }, { name: 'Календарь 30%' }, { name: 'Купидон 25%' }, { name: 'Пепе 15%', gold: true }
+          { text: 'Подарочек 10%' }, { text: 'Кольцо 20%' }, { text: 'Календарь 30%' }, { text: 'Купидон 25%' }, { text: 'Пепе 15%', highlight: true }
         ]
       },
       {
+        id: 3,
+        name: 'Gold',
         price: 750,
-        title: 'Золотой Кейс',
-        mainArt: SVG_ICONS.cupid,
+        art: ICONS.cupid,
         chances: [
-          { name: 'Подарочек 5%' }, { name: 'Кольцо 15%' }, { name: 'Календарь 30%' }, { name: 'Купидон 30%' }, { name: 'Пепе 20%', gold: true }
+          { text: 'Подарочек 5%' }, { text: 'Кольцо 15%' }, { text: 'Календарь 30%' }, { text: 'Купидон 30%' }, { text: 'Пепе 20%', highlight: true }
         ]
       },
       {
+        id: 4,
+        name: 'Dynasty VIP',
         price: 1000,
-        title: 'Dynasty VIP Box',
-        mainArt: SVG_ICONS.pepe,
+        art: ICONS.pepe,
         chances: [
-          { name: 'Подарочек 2%' }, { name: 'Кольцо 8%' }, { name: 'Календарь 25%' }, { name: 'Купидон 35%' }, { name: 'Пепе 30%', gold: true }
+          { text: 'Подарочек 2%' }, { text: 'Кольцо 8%' }, { text: 'Календарь 25%' }, { text: 'Купидон 35%' }, { text: 'Пепе 30%', highlight: true }
         ]
       }
     ];
 
-    function renderCases() {
-      const grid = document.getElementById('cases-grid');
-      grid.innerHTML = CASES.map(c => `
-        <div class="case-card">
-          <div class="case-header">
-            <div class="case-title">✨ ${c.title}</div>
-            <div class="case-price">${c.price} ⭐</div>
-          </div>
+    let currentCaseIndex = 0;
 
-          <div class="case-banner">
-            <div class="banner-badge">CASE 1:1</div>
-            <img class="main-art" src="${c.mainArt}" />
-          </div>
-
-          <div class="chances-list">
-            ${c.chances.map(ch => `<div class="chance-pill ${ch.gold ? 'gold' : ''}">${ch.name}</div>`).join('')}
-          </div>
-
-          <div class="btn-row">
-            <button class="btn-demo" onclick="spinCase(${c.price}, true)">Демо</button>
-            <button class="btn-gold" onclick="spinCase(${c.price}, false)">Открыть (${c.price} ⭐)</button>
-          </div>
+    function renderCaseTabs() {
+      const container = document.getElementById('casesTabs');
+      container.innerHTML = CASES.map((c, i) => `
+        <div class="case-tab-item ${i === currentCaseIndex ? 'active' : ''}" onclick="selectCase(${i})">
+          <span>${c.name}</span>
+          <span class="price-badge">${c.price} ⭐</span>
         </div>
+      `).join('');
+      updateActiveCaseView();
+    }
+
+    function selectCase(index) {
+      currentCaseIndex = index;
+      document.querySelectorAll('.case-tab-item').forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+      });
+      updateActiveCaseView();
+    }
+
+    function updateActiveCaseView() {
+      const c = CASES[currentCaseIndex];
+      document.getElementById('activeCaseImg').src = c.art;
+      document.getElementById('openCaseBtn').innerText = `Открыть за ${c.price} ⭐`;
+
+      const chancesContainer = document.getElementById('activeChances');
+      chancesContainer.innerHTML = c.chances.map(ch => `
+        <div class="chance-chip ${ch.highlight ? 'highlight' : ''}">${ch.text}</div>
       `).join('');
     }
 
     let isSpinning = false;
-    async function spinCase(price, isDemo) {
+    async function spinCurrentCase(isDemo) {
       if (isSpinning) return;
-
+      const c = CASES[currentCaseIndex];
       let realRewardStars = 0;
       let wonItem = null;
 
@@ -513,7 +604,7 @@
           const res = await fetch(`${API_URL}/open-case`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tg_id: userId, price: price })
+            body: JSON.stringify({ tg_id: userId, price: c.price })
           });
           const data = await res.json();
           if (!data.success) {
@@ -523,23 +614,22 @@
           realRewardStars = data.rewardStars;
           document.getElementById('balance').innerText = data.newBalance;
         } catch (e) {
-          alert('Ошибка связи с сервером');
+          alert('Ошибка соединения с сервером');
           return;
         }
       } else {
-        // В ДЕМО-РЕЖИМЕ выпадает крутой NFT!
         const pool = [ITEMS.pepe, ITEMS.cupid, ITEMS.calendar, ITEMS.ring, ITEMS.gift];
         wonItem = pool[Math.floor(Math.random() * pool.length)];
       }
 
       isSpinning = true;
       const modal = document.getElementById('rouletteModal');
-      const track = document.getElementById('tapeTrack');
+      const track = document.getElementById('tapeStrip');
       const resText = document.getElementById('spinResult');
       const closeBtn = document.getElementById('closeSpinBtn');
 
-      document.getElementById('modalTitle').innerText = isDemo ? '🎮 Демо прокрутка' : `Кейс ${price} ⭐`;
-      resText.innerText = 'Крутим рулетку...';
+      document.getElementById('modalTitle').innerText = isDemo ? 'Демо прокрутка' : `Кейс ${c.name}`;
+      resText.innerText = 'Определение результата...';
       closeBtn.style.display = 'none';
       modal.classList.add('show');
 
@@ -548,53 +638,45 @@
       const stopIndex = 48;
 
       for (let i = 0; i < 60; i++) {
-        let currentItem;
-        if (isDemo && i === stopIndex) {
-          currentItem = wonItem;
-        } else {
-          currentItem = allItems[Math.floor(Math.random() * allItems.length)];
-        }
-
+        let currentItem = (isDemo && i === stopIndex) ? wonItem : allItems[Math.floor(Math.random() * allItems.length)];
         tapeHTML += `
-          <div class="item-card">
+          <div class="tape-item">
             <img src="${currentItem.img}" />
-            <div class="name">${currentItem.name}</div>
-            <div class="badge-rarity">${currentItem.badge}</div>
+            <div class="item-title">${currentItem.name}</div>
           </div>
         `;
       }
       track.innerHTML = tapeHTML;
-
       track.style.transition = 'none';
       track.style.transform = 'translateX(0px)';
 
       setTimeout(() => {
-        const cardWidth = 126;
-        const wrapperCenter = modal.querySelector('.tape-wrapper').offsetWidth / 2;
+        const cardWidth = 122;
+        const wrapperCenter = modal.querySelector('.tape-window').offsetWidth / 2;
         const targetOffset = - (stopIndex * cardWidth - wrapperCenter + (cardWidth / 2));
 
-        track.style.transition = 'transform 5.5s cubic-bezier(0.12, 0.8, 0.2, 1)';
+        track.style.transition = 'transform 5.2s cubic-bezier(0.1, 0.85, 0.2, 1)';
         track.style.transform = `translateX(${targetOffset}px)`;
       }, 50);
 
       setTimeout(() => {
         isSpinning = false;
         if (isDemo) {
-          resText.innerHTML = `<span style="color: #ffd700;">🎉 (Демо) Вы выиграли: ${wonItem.name}!</span>`;
+          resText.innerHTML = `<span style="color: #ffffff;">Выигрыш: ${wonItem.name}</span>`;
         } else {
-          resText.innerHTML = `Вы получили: <span style="color: #ffd700;">+${realRewardStars} ⭐</span> (Утешительный приз)`;
+          resText.innerHTML = `Начислено: <span style="color: #ffffff;">+${realRewardStars} ⭐</span>`;
         }
         closeBtn.style.display = 'block';
-      }, 5800);
+      }, 5500);
     }
 
     function closeRoulette() {
       document.getElementById('rouletteModal').classList.remove('show');
     }
 
-    function switchTab(tabId, el) {
+    function switchNav(tabId, el) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`tab-${tabId}`).classList.add('active');
       el.classList.add('active');
     }
@@ -616,7 +698,7 @@
         });
         const data = await res.json();
         if (data.success) {
-          alert(`Ты получил: +${data.reward} ⭐`);
+          alert(`Получено: +${data.reward} ⭐`);
           document.getElementById('balance').innerText = data.newBalance;
         } else {
           alert(data.error);
@@ -626,7 +708,7 @@
       }
     }
 
-    renderCases();
+    renderCaseTabs();
     loadData();
   </script>
 </body>
